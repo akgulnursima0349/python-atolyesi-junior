@@ -139,6 +139,48 @@ async function oynaKarar(p, shot) {
   await p.waitForSelector(".end");
 }
 
+async function oynaListe(p, shot) {
+  for (const i of [1, 0, 2]) await p.click(`.wagon >> nth=${i}`);
+  await bekleDevam(p); await shot("d5_1"); await p.click(".next");
+  await p.click(".opt:has-text('🍌')"); ok(/1'den/.test(await p.textContent(".bubble")), "1'den sayma yanılgısına özel ipucu"); await p.click(".opt:has-text('🍇')"); await devam(p);
+  await p.click(".add button >> nth=1"); await p.click("text=➕ append"); await p.waitForTimeout(900);
+  ok((await p.$$(".train-wrap .wagon")).length === 3, "append vagon ekledi");
+  await p.click("text=➖ pop"); await bekleDevam(p); await shot("d5_3"); await p.click(".next");
+  // makas: a=1,b=3 → THO (2:5): a+1, b+2 ; sonra PY (0:2): a-2, b-3
+  await p.click(".num-btn >> nth=0 >> button >> nth=1"); await p.click(".num-btn >> nth=1 >> button >> nth=1"); await p.click(".num-btn >> nth=1 >> button >> nth=1");
+  ok(/Kestin/.test(await p.textContent(".bubble")), "THO kesildi");
+  for (let k = 0; k < 2; k++) await p.click(".num-btn >> nth=0 >> button >> nth=0");
+  for (let k = 0; k < 3; k++) await p.click(".num-btn >> nth=1 >> button >> nth=0");
+  await bekleDevam(p); await shot("d5_4"); await p.click(".next");
+  await p.click(".drawer >> nth=1"); await p.click(".drawer >> nth=2"); await bekleDevam(p); await shot("d5_5"); await p.click(".next");
+  await p.click(".opt:has-text('10')"); await p.click(".opt:has-text('7')"); await devam(p);
+  await p.fill(".editor", 'sepet = ["elma", "muz", "çilek"]\nprint(sepet)'); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.bad", { timeout: 20000 }); ok(/append/.test(await p.textContent(".msg")), "append kullanmayana uyarı");
+  await p.fill(".editor", 'sepet = ["elma", "muz"]\nsepet.append("çilek")\nprint(sepet)'); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.ok", { timeout: 10000 }); await shot("d5_7"); await p.click(".next");
+  await p.waitForSelector(".end");
+}
+
+async function oynaFonk(p, shot) {
+  await p.click("text=selam_ver() çağır"); await p.waitForSelector(".actions .btn:not(.next):not([disabled])");
+  await p.waitForTimeout(300); await p.click("text=selam_ver() çağır"); await bekleDevam(p); await shot("d6_1"); await p.click(".next");
+  await p.click(".opt:has-text('Ada')"); await p.waitForTimeout(2200); await p.click(".opt:has-text('Ece')"); await bekleDevam(p); await shot("d6_2"); await p.click(".next");
+  await p.click("text=▶ Çalıştır"); await p.waitForTimeout(300); await p.waitForSelector(".actions .btn:not(.next):not([disabled])", { timeout: 8000 });
+  ok((await p.textContent(".chip em")) === "16", "kare(4) = 16 kutuya düştü");
+  await p.click(".num-btn button >> nth=1"); await p.click("text=▶ Çalıştır"); await bekleDevam(p); await shot("d6_3"); await p.click(".next");
+  await p.click(".opt:has-text('10')"); await p.click(".opt:has-text('11')"); await devam(p);
+  for (const r of ["kırmızı", "mavi", "yeşil"]) { await p.click(`.color-pick:has-text("${r}")`); await p.waitForTimeout(1300); }
+  ok((await p.$$(".robots .made-bot")).length === 3, "kalıptan 3 robot üretildi"); await bekleDevam(p); await shot("d6_5"); await p.click(".next");
+  await p.click(".opt.wide >> nth=0"); await p.waitForTimeout(900);
+  await p.click(".opt:has-text('r2')"); await p.click(".opt.wide >> nth=1"); await p.waitForTimeout(900); await p.click(".opt.wide >> nth=2");
+  await bekleDevam(p); await shot("d6_6"); await p.click(".next");
+  await p.click("text=▶ Çalıştır"); await p.waitForSelector(".msg.bad", { timeout: 20000 });
+  ok(/çağırmadın/.test(await p.textContent(".msg")), "çağrılmayan fonksiyon için uyarı");
+  await p.fill(".editor", 'def selam_ver(isim):\n    print("Merhaba " + isim)\n\nselam_ver("Bit")'); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.ok", { timeout: 10000 }); await shot("d6_7"); await p.click(".next");
+  await p.waitForSelector(".end");
+}
+
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   for (const [ad, vp, touch] of [["masaustu", { width: 1280, height: 860 }, false], ["tablet", { width: 820, height: 1180 }, true], ["telefon", { width: 390, height: 844 }, true]]) {
@@ -161,9 +203,9 @@ async function oynaKarar(p, shot) {
     ok(durumlar[0] === "acik" && durumlar.slice(1, 4).every((d) => d === "kilitli"), "yalnızca Dünya 1 açık, 2–4 kilitli");
     ok(!(await tasma()), "haritada yatay taşma yok");
     await p.click('.node[data-no="3"]'); ok(/önceki/.test(await p.textContent(".bubble")), "kilitli dünyaya dokununca Bit uyarıyor");
-    await p.click('.node[data-no="5"]'); ok(/hazırlanıyor/.test(await p.textContent(".bubble")), "hazırlanan dünyaya dokununca Bit açıklıyor");
+    await p.click('.node[data-no="7"]'); ok(/hazırlanıyor/.test(await p.textContent(".bubble")), "hazırlanan dünyaya dokununca Bit açıklıyor");
 
-    const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu]];
+    const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu], [5, oynaListe], [6, oynaFonk]];
     for (const [no, oyna] of oyunlar) {
       await p.click(`.node[data-no="${no}"]`); await p.waitForSelector(".card .say");
       ok(!(await tasma()), `Dünya ${no} ekranında yatay taşma yok`);
@@ -172,10 +214,10 @@ async function oynaKarar(p, shot) {
       await p.click("text=Haritaya dön");
       await p.waitForSelector(`.node[data-no="${no}"].bitti`);
       if (no === 1) ok(await p.evaluate(() => !window.Sk), "Python (Skulpt) ilk Yaz ekranına kadar yüklenmedi");
-      if (no < 4) ok(await p.isVisible(`.node[data-no="${no + 1}"].acik`), `Dünya ${no} bitince Dünya ${no + 1} açıldı`);
+      if (no < 6) ok(await p.isVisible(`.node[data-no="${no + 1}"].acik`), `Dünya ${no} bitince Dünya ${no + 1} açıldı`);
     }
     const yildiz = Number(await p.textContent(".m-top .score span"));
-    ok(yildiz === 37, `toplam yıldız 37 (bulunan ${yildiz})`);
+    ok(yildiz === 53, `toplam yıldız 53 (bulunan ${yildiz})`);
     const uzun = [...new Set(kelime)].filter((t) => t.trim().split(/\s+/).length > 12);
     ok(uzun.length === 0, "Bit cümleleri en fazla 12 kelime" + (uzun.length ? ": " + uzun.join(" | ") : ""));
 

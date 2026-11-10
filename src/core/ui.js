@@ -16,8 +16,8 @@ export const stars = (n) => STAR.repeat(n);
 export function hl(src) {
   return src.replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/("[^"]*")/g, '<span class="st">$1</span>')
-    .replace(/\b(for|in|if|else|elif|while|def|return)\b(?![^<]*<\/span>)/g, '<span class="kw">$1</span>')
-    .replace(/\b(print|range|len|input|ileri|yukari|zipla)\b(?![^<]*<\/span>)/g, '<span class="fn">$1</span>')
+    .replace(/\b(for|in|if|else|elif|while|def|return|class)\b(?![^<]*<\/span>)/g, '<span class="kw">$1</span>')
+    .replace(/\b(print|range|len|input|ileri|yukari|zipla|append|pop)\b(?![^<]*<\/span>)/g, '<span class="fn">$1</span>')
     .replace(/(^|[^\w#"])(\d+)(?![^<]*<\/span>)/g, '$1<span class="nu">$2</span>')
     .replace(/(#.*)$/, '<span class="cm">$1</span>');
 }
