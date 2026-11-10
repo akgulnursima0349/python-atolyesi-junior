@@ -5,6 +5,10 @@ import { ilk } from "./ilk.js";
 import { karar } from "./karar.js";
 import { listeDunyasi } from "./liste.js";
 import { fonk } from "./fonk.js";
+import { yz } from "./yz.js";
+import { rakam } from "./rakam.js";
+import { penguen } from "./penguen.js";
+import { ressam } from "./ressam.js";
 import { store } from "../core/store.js";
 
 export const WORLDS = [
@@ -14,10 +18,10 @@ export const WORLDS = [
   dongu,
   listeDunyasi,
   fonk,
-  { id: "yz", no: 7, title: "Yapay Zekânın Alet Çantası", icon: "🧰", color: "#ffd84d", screens: null },
-  { id: "rakam", no: 8, title: "Rakam Okuyan Yapay Zekâ", icon: "✏️", color: "#7fd6d1", screens: null },
-  { id: "penguen", no: 9, title: "Penguen Dedektifi", icon: "🐧", color: "#9fb8ff", screens: null },
-  { id: "ressam", no: 10, title: "Yapay Zekâ Ressamı", icon: "🎨", color: "#ff9d7a", screens: null }
+  yz,
+  rakam,
+  penguen,
+  ressam
 ];
 
 export const hazir = (w) => Array.isArray(w.screens) && w.screens.length > 0;

@@ -49,7 +49,10 @@ function cevir(e, satir, kod) {
   return { mesaj, satir: /en az <b>bir komut/.test(mesaj) ? null : satir };
 }
 
-export async function run(kod) {
+/* onek: çocuğun görmediği hazır kod (ör. küçük bir model sınıfı). Hata satırları çocuğun koduna göre düzeltilir. */
+export async function run(kodCocuk, onek = "") {
+  const kaydir = onek ? onek.split("\n").length : 0;
+  const kod = onek ? onek + "\n" + kodCocuk : kodCocuk;
   await hazirla();
   const Sk = window.Sk, out = [];
   let buf = "", adim = 0, satir = 0;
@@ -73,5 +76,6 @@ export async function run(kod) {
     }
   } catch (e) { hata = cevir(e, satir, kod); }
   if (buf) out.push(buf);
+  if (hata && hata.satir) { hata.satir -= kaydir; if (hata.satir < 1) hata.satir = null; }
   return { out, hata };
 }
