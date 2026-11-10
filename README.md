@@ -1,0 +1,29 @@
+# Python Atölyesi Junior
+
+Sivas Robotik Akademi · 4–6. sınıflar için oyunlu Python ve yapay zekâ kursu.
+10 dünya, her ekranda tek fikir: önce izle, sonra sen dene. Rehber karakter: **Bit**.
+
+| Dünya | Konu |
+| --- | --- |
+| 1 · Bilgisayarın Dili | sıralı komutlar, 0 ve 1, diller, yorumlayıcı |
+| 2 · Python'un İlk Sözleri | print, değişken, işlemler, yazılar |
+| 3 · Karar Veren Robot | if / else / elif, karşılaştırma, girinti |
+| 4 · Döngü Robotu | for, range, liste gezme, biriktirme, Arduino karşılaştırması |
+| 5 · Vagonlar ve Dolaplar | liste, indeks, append/pop, dilimleme, sözlük |
+| 6 · Makineler ve Fabrikalar | fonksiyon, parametre, return, sınıf, metot |
+| 7 · Yapay Zekânın Alet Çantası | örnekten öğrenme, Pandas, grafik, ilk model |
+| 8 · Rakam Okuyan Yapay Zekâ | en yakın komşu (KNN), kendi rakamını çiz |
+| 9 · Penguen Dedektifi | karar ağacı, rastgele orman |
+| 10 · Yapay Zekâ Ressamı | K-Means, renk gruplama, pop-art |
+
+## Çalıştırma
+```
+npm install
+npm run dev      # geliştirme
+npm run build    # dist/ klasörüne derler
+node test/e2e.cjs  # uçtan uca test (Playwright gerekir; önce build)
+```
+
+Hesap yok; ilerleme tarayıcıda saklanır. Öğretmen sayfası (`#ogretmen`) bir cihazda bütün dünyaları açar.
+Python kodları tarayıcıda Skulpt ile, yapay zekâ modelleri JavaScript ile çalışır; hiçbir veri dışarı gönderilmez.
+Şartnameler `docs/` klasöründe.
