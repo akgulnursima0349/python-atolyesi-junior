@@ -181,9 +181,107 @@ async function oynaFonk(p, shot) {
   await p.waitForSelector(".end");
 }
 
+const ayarla = (p, sel, v) => p.evaluate(([s, v]) => { const r = document.querySelector(s); r.value = v; r.dispatchEvent(new Event("input")); }, [sel, v]);
+async function svgTikla(p, sel, fx, fy) { const b = await (await p.$(sel)).boundingBox(); await p.mouse.click(b.x + b.width * fx, b.y + b.height * fy); }
+async function cizgi(p, sel, pts) {
+  const b = await (await p.$(sel)).boundingBox(); await p.mouse.move(b.x + b.width * pts[0][0], b.y + b.height * pts[0][1]); await p.mouse.down();
+  for (const [x, y] of pts.slice(1)) await p.mouse.move(b.x + b.width * x, b.y + b.height * y, { steps: 10 });
+  await p.mouse.up();
+}
+function renkliPng() {
+  const zlib = require("zlib"), W = 48, H = 36, satir = [];
+  for (let y = 0; y < H; y++) { const r = [0]; for (let x = 0; x < W; x++) r.push(x < 16 ? 230 : x < 32 ? 40 : 250, y < 18 ? 60 : 200, (x * 5) % 255); satir.push(Buffer.from(r)); }
+  const crc = (b) => { let c, t = []; for (let n = 0; n < 256; n++) { c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } c = 0xffffffff; for (const x of b) c = t[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const parca = (tip, veri) => { const u = Buffer.alloc(4); u.writeUInt32BE(veri.length); const tv = Buffer.concat([Buffer.from(tip), veri]); const c = Buffer.alloc(4); c.writeUInt32BE(crc(tv)); return Buffer.concat([u, tv, c]); };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(W, 0); ihdr.writeUInt32BE(H, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const f = path.join(require("os").tmpdir(), "foto.png");
+  fs.writeFileSync(f, Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), parca("IHDR", ihdr), parca("IDAT", zlib.deflateSync(Buffer.concat(satir))), parca("IEND", Buffer.alloc(0))]));
+  return f;
+}
+
+async function oynaYz(p, shot) {
+  for (let i = 0; i < 4; i++) await p.click(`.ex-card[data-i="${i}"]`);
+  await p.click("text=Yeni meyveyi sor"); await bekleDevam(p); ok(/portakal/.test(await p.textContent(".answer")), "model yeni meyveye portakal dedi"); await shot("d7_1"); await p.click(".next");
+  await p.click("th button >> nth=1"); await p.click("text=Ortalama ağırlık"); await bekleDevam(p); await shot("d7_2"); await p.click(".next");
+  await p.click("text=📈 Çiz"); await bekleDevam(p); await shot("d7_3"); await p.click(".next");
+  await p.click(".opt >> nth=0"); await p.click(".opt >> nth=1"); await devam(p);
+  ok(/elma/.test(await p.textContent(".verdict")), "başlangıçta model elma diyor");
+  await ayarla(p, "#w", 185); await ayarla(p, "#p", 9); ok(/portakal/.test(await p.textContent(".verdict")), "ağır ve pürüzlü meyveye portakal");
+  await bekleDevam(p); await shot("d7_5"); await p.click(".next");
+  for (let k = 0; k < 3; k++) await p.click(".havuz .kart >> nth=0");
+  await p.click("text=▶ Çalıştır"); await p.waitForSelector("text=▶ Tekrar çalıştır"); ok(/soramazsın|eğitemezsin/.test(await p.textContent(".bubble")), "yanlış model sırasında açıklama");
+  for (let k = 0; k < 3; k++) await p.click(".prog .kart >> nth=0");
+  for (const t of ["KNeighborsClassifier()", "model.fit", "model.predict"]) await p.click(`.havuz .kart:has-text("${t}")`);
+  await p.click("text=Tekrar çalıştır"); await devam(p);
+  await p.click("text=▶ Çalıştır"); await p.waitForSelector(".msg.bad", { timeout: 20000 });
+  await p.fill(".editor", 'X = [[140, 2], [130, 1], [175, 8], [185, 10]]\ny = ["elma", "elma", "portakal", "portakal"]\nmodel = KNeighborsClassifier(n_neighbors=1)\nmodel.fit(X, y)\nprint(model.predict([[175, 8]]))');
+  await p.click("text=▶ Çalıştır"); await p.waitForSelector(".msg.ok", { timeout: 20000 });
+  ok(/portakal/.test(await p.textContent(".so-lines")), "Python'daki küçük model portakal dedi"); await shot("d7_7"); await p.click(".next");
+  await p.waitForSelector(".end");
+}
+
+async function oynaRakam(p, shot) {
+  await p.click("button:has-text('Sayı olarak gör')"); await bekleDevam(p); await shot("d8_1"); await p.click(".next");
+  await p.waitForSelector(".sim-cand"); await p.click(".sim-cand >> nth=0"); ok(await p.isVisible(".sim-cand.no"), "benzemeyen rakamda uyarı");
+  await p.click(".sim-cand >> nth=1"); await bekleDevam(p); await shot("d8_2"); await p.click(".next");
+  await p.waitForSelector(".nb-target .dgrid"); await p.click("text=Komşuları bul"); await bekleDevam(p); await shot("d8_3"); await p.click(".next");
+  await p.waitForTimeout(300);
+  await cizgi(p, "canvas.draw", [[0.25, 0.22], [0.75, 0.22], [0.42, 0.85]]); await p.click("button:has-text('Tahmin et')");
+  const t7 = await p.textContent(".guess-big"); ok(t7 === "7", `çizilen 7'yi okudu (tahmin ${t7})`);
+  await p.click("button:has-text('Temizle')"); await cizgi(p, "canvas.draw", [[0.5, 0.12], [0.5, 0.88]]); await p.click("button:has-text('Tahmin et')");
+  const t1 = await p.textContent(".guess-big"); ok(t1 === "1", `çizilen 1'i okudu (tahmin ${t1})`);
+  await bekleDevam(p); await shot("d8_4"); await p.click(".next");
+  await p.waitForSelector(".opt"); await p.click(".opt >> nth=1"); await p.click(".opt >> nth=0"); await devam(p);
+  await p.click(".opt:has-text('k = 1')"); await p.waitForSelector(".opt:has-text('k = 3'):not([disabled])", { timeout: 20000 });
+  await p.click(".opt:has-text('k = 3')"); await bekleDevam(p);
+  ok(/%9[5-9]/.test(await p.textContent(".acc-hist")), "test doğruluğu %95'in üstünde: " + (await p.textContent(".acc-hist"))); await shot("d8_6"); await p.click(".next");
+  for (const t of ["Rakamı çiz", "8×8", "64 sayıya", "komşuları", "Oyları"]) await p.click(`.havuz .kart:has-text("${t}")`);
+  await p.click("text=▶ Çalıştır"); await devam(p);
+  await p.waitForSelector(".end");
+}
+
+async function oynaPenguen(p, shot) {
+  for (let i = 0; i < 3; i++) await p.click(`.peng-card >> nth=${i}`);
+  await bekleDevam(p); await shot("d9_1"); await p.click(".next");
+  await p.click(".opt:has-text('Gaga > 43')"); ok(/karışık/.test(await p.textContent(".bubble")), "kötü soruda karışık uyarısı");
+  await p.click(".opt:has-text('Yüzgeç > 206')"); await bekleDevam(p); await shot("d9_2"); await p.click(".next");
+  await p.click(".opt:has-text('Yüzgeç > 190')"); await p.click(".opt:has-text('Gaga > 43')"); await bekleDevam(p);
+  ok(/94,4/.test(await p.textContent(".bubble")), "ağaç doğruluğu %94,4"); await shot("d9_3"); await p.click(".next");
+  await p.click("text=Evet ✔"); await p.waitForTimeout(1300);
+  await p.click("text=Evet ✔"); ok(/Tekrar bak/.test(await p.textContent(".bubble")), "yanlış dalda uyarı");
+  await p.click("text=Hayır ✘"); await p.click("text=Evet ✔"); await bekleDevam(p); await shot("d9_4"); await p.click(".next");
+  await p.click(".opt >> nth=0"); await p.click(".opt >> nth=1"); await devam(p);
+  await p.click("text=🗳️ Oylat"); await bekleDevam(p); ok(/Chinstrap/.test(await p.textContent(".bubble")), "orman Chinstrap dedi"); await shot("d9_6"); await p.click(".next");
+  await p.fill(".editor", 'yuzgec = 215\ngaga = 48\nprint("Gentoo")'); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.bad", { timeout: 20000 }); ok(/if/.test(await p.textContent(".msg")), "if kullanmayana uyarı");
+  await p.fill(".editor", 'yuzgec = 215\ngaga = 48\nif yuzgec > 206:\n    print("Gentoo")'); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.ok", { timeout: 20000 }); await p.click(".next");
+  await p.waitForSelector(".end");
+}
+
+async function oynaRessam(p, shot, fotograf) {
+  for (const [x, y] of [[0.25, 0.25], [0.75, 0.3], [0.5, 0.75]]) await svgTikla(p, ".stage svg.plot", x, y);
+  await bekleDevam(p); await shot("d10_1"); await p.click(".next");
+  for (let i = 0; i < 40 && (await p.isHidden(".next")); i++) { await p.click("text=Bir adım"); await p.waitForSelector(".actions .btn:not(.next):not([disabled]), .next:not([hidden])"); }
+  await bekleDevam(p); await shot("d10_2");
+  ok(await p.evaluate(() => new Set([...document.querySelectorAll(".kpt")].map((c) => c.style.fill)).size === 3), "K-Means 3 grubun hepsini buldu");
+  await p.click(".next");
+  await p.click(".opt >> nth=1"); await p.click(".opt >> nth=0"); await devam(p);
+  await svgTikla(p, ".stage svg.plot", 0.3, 0.6); await svgTikla(p, ".stage svg.plot", 0.6, 0.4);
+  await p.click("text=Yapay zekâ yerleştirsin"); await bekleDevam(p); await shot("d10_4"); await p.click(".next");
+  await p.click("text=Renkleri bul"); await p.waitForSelector(".actions .btn:not(.next):not([disabled])");
+  await p.click(".num-btn button >> nth=1"); await p.click("text=Renkleri bul"); await bekleDevam(p);
+  ok((await p.$$(".palette i")).length === 4, "resim 4 renge indi"); await shot("d10_5"); await p.click(".next");
+  if (fotograf) await p.setInputFiles('input[type="file"]', renkliPng()); else await p.click("text=Örnek resim");
+  await bekleDevam(p); ok((await p.$$(".pop-grid canvas")).length === 4, fotograf ? "yüklenen fotoğraftan 4 pop-art" : "örnek resimden 4 pop-art"); await shot("d10_6"); await p.click(".next");
+  for (const t of ["yıldız koy", "boya", "taşı", "tekrarla"]) await p.click(`.havuz .kart:has-text("${t}")`);
+  await p.click("text=▶ Çalıştır"); await devam(p);
+  await p.waitForSelector(".end"); await shot("d10_son");
+}
+
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
-  for (const [ad, vp, touch] of [["masaustu", { width: 1280, height: 860 }, false], ["tablet", { width: 820, height: 1180 }, true], ["telefon", { width: 390, height: 844 }, true]]) {
+  for (const [ad, vp, touch] of [["masaustu", { width: 1280, height: 860 }, false], ["tablet", { width: 820, height: 1180 }, true], ["telefon", { width: 390, height: 844 }, true]].filter(([a]) => !process.env.SADECE || process.env.SADECE === a)) {
     console.log(`\n${ad} (${vp.width}px)`);
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch });
     const p = await ctx.newPage();
@@ -203,9 +301,9 @@ async function oynaFonk(p, shot) {
     ok(durumlar[0] === "acik" && durumlar.slice(1, 4).every((d) => d === "kilitli"), "yalnızca Dünya 1 açık, 2–4 kilitli");
     ok(!(await tasma()), "haritada yatay taşma yok");
     await p.click('.node[data-no="3"]'); ok(/önceki/.test(await p.textContent(".bubble")), "kilitli dünyaya dokununca Bit uyarıyor");
-    await p.click('.node[data-no="7"]'); ok(/hazırlanıyor/.test(await p.textContent(".bubble")), "hazırlanan dünyaya dokununca Bit açıklıyor");
+    ok(durumlar.every((d) => d !== "hazirlaniyor"), "hazırlanıyor durumunda dünya kalmadı");
 
-    const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu], [5, oynaListe], [6, oynaFonk]];
+    const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu], [5, oynaListe], [6, oynaFonk], [7, oynaYz], [8, oynaRakam], [9, oynaPenguen], [10, (p, sh) => oynaRessam(p, sh, ad !== "masaustu")]];
     for (const [no, oyna] of oyunlar) {
       await p.click(`.node[data-no="${no}"]`); await p.waitForSelector(".card .say");
       ok(!(await tasma()), `Dünya ${no} ekranında yatay taşma yok`);
@@ -214,10 +312,10 @@ async function oynaFonk(p, shot) {
       await p.click("text=Haritaya dön");
       await p.waitForSelector(`.node[data-no="${no}"].bitti`);
       if (no === 1) ok(await p.evaluate(() => !window.Sk), "Python (Skulpt) ilk Yaz ekranına kadar yüklenmedi");
-      if (no < 6) ok(await p.isVisible(`.node[data-no="${no + 1}"].acik`), `Dünya ${no} bitince Dünya ${no + 1} açıldı`);
+      if (no < 10) ok(await p.isVisible(`.node[data-no="${no + 1}"].acik`), `Dünya ${no} bitince Dünya ${no + 1} açıldı`);
     }
     const yildiz = Number(await p.textContent(".m-top .score span"));
-    ok(yildiz === 53, `toplam yıldız 53 (bulunan ${yildiz})`);
+    ok(yildiz === 87, `toplam yıldız 87 (bulunan ${yildiz})`);
     const uzun = [...new Set(kelime)].filter((t) => t.trim().split(/\s+/).length > 12);
     ok(uzun.length === 0, "Bit cümleleri en fazla 12 kelime" + (uzun.length ? ": " + uzun.join(" | ") : ""));
 
@@ -241,7 +339,7 @@ async function oynaFonk(p, shot) {
 
     // kilitli dünyaya doğrudan adresle girilemiyor
     await p.goto(URL + "#dunya-9"); await p.waitForSelector(".node");
-    ok(true, "hazır olmayan dünyanın adresi haritaya döndürüyor");
+    ok(true, "kilitli dünyanın adresi haritaya döndürüyor");
 
     ok(errs.length === 0, "konsolda hata yok" + (errs.length ? ": " + errs.slice(0, 3).join(" | ") : ""));
     await ctx.close();

@@ -472,3 +472,148 @@ div.drawer { cursor: default }
 @keyframes hopBot { 30% { transform: translateY(-36px) } 60% { transform: none } 75% { transform: translateY(-12px) } }
 @keyframes danceBot { 20% { transform: rotate(-15deg) } 40% { transform: rotate(15deg) } 60% { transform: rotate(-15deg) } 80% { transform: rotate(15deg) } }
 @keyframes waveBot { 25%, 75% { transform: scale(1.12) } 50% { transform: scale(.95) } }
+
+/* ===================== Faz 4 sahneleri ===================== */
+/* grafik */
+.plot { width: 100%; max-width: 440px; height: auto; touch-action: none }
+.plot-bg { fill: var(--card) }
+.plot-grid { stroke: var(--line); stroke-width: 1 }
+.plot-tick { font: 600 11px var(--f-disp); fill: var(--ink-2) }
+.plot-label { font: 700 12px var(--f-disp); fill: var(--ink-2) }
+.plot-note { font: 700 13px var(--f-disp) }
+.plot-note.elma { fill: #d93b3b } .plot-note.portakal { fill: #e07a00 }
+.pt { stroke: #fff; stroke-width: 2; transition: cx .15s, cy .15s }
+.pt.elma { fill: #ff4d4d } .pt.portakal { fill: #ff9f1c }
+.pt.yeni { fill: #9aa6b8; stroke: var(--ink); stroke-width: 3 }
+.pt.grow { animation: growPt .35s ease-out; transform-box: fill-box; transform-origin: center }
+.ln-k { stroke: var(--ink-2); stroke-width: 2; stroke-dasharray: 4 4 }
+.ln-k.near.elma { stroke: #ff4d4d } .ln-k.near.portakal { stroke: #ff9f1c }
+@keyframes growPt { from { transform: scale(0) } to { transform: scale(1) } }
+
+/* örnek kartları ve beyin */
+.ex-cards { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center }
+.ex-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 14px; border-radius: 14px; border: 3px solid var(--line); background: var(--card); font: 700 14px var(--f-disp); color: var(--ink); cursor: pointer; transition: transform .4s, opacity .4s }
+.ex-card:hover:not(:disabled) { border-color: var(--accent) }
+.ex-e { font-size: 34px }
+.ex-card.fed { transform: translateY(40px) scale(.6); opacity: .3 }
+.brain { display: flex; align-items: center; gap: 10px; background: var(--card); border: 3px solid var(--robot); border-radius: 99px; padding: 8px 20px; font-weight: 800 }
+.brain-ico { font-size: 34px }
+.ask { display: flex; align-items: center; gap: 12px; font: 700 20px var(--f-disp); flex-wrap: wrap; justify-content: center }
+.mystery { font-size: 40px } .answer { color: var(--accent); font-size: 26px }
+
+/* tablo */
+.df { border-collapse: collapse; font: 600 16px var(--f-code); background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 0 var(--line) }
+.df th, .df td { padding: 6px 12px; text-align: center; border-bottom: 1px solid var(--line) }
+.df th button { font: 800 15px var(--f-disp); border: 0; background: var(--hl-soft); border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink) }
+.df th button:hover { background: var(--hl) }
+.df .idx { color: var(--ink-2); font-size: 13px }
+.df .col-on { background: var(--hl-soft) }
+.df th.col-on button, .df th button.col-on { background: var(--hl) }
+
+/* kaydırıcılar */
+.sliders { display: flex; flex-direction: column; gap: 6px; width: min(360px, 100%) }
+.sliders label { display: flex; align-items: center; gap: 10px; font-size: 22px }
+.sliders input { flex: 1; accent-color: var(--accent); height: 28px; min-width: 0 }
+.sv { font: 700 16px var(--f-code); min-width: 60px; text-align: right }
+.verdict { font: 800 24px var(--f-disp); min-height: 34px } .verdict small { font: 600 14px var(--f-disp); color: var(--ink-2) }
+
+/* boru hattı */
+.pipeline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center }
+.pipe-step { display: flex; flex-direction: column; align-items: center; padding: 10px 14px; border-radius: 14px; background: var(--card); border: 3px solid var(--line); font-size: 30px; transition: border-color .2s, background .2s }
+.pipe-step b { font: 800 14px var(--f-disp) }
+.pipe-step.on { border-color: var(--ok); background: #e3f5ea } .pipe-step.bad { border-color: var(--bad); background: #fde9ea }
+.pipe-ar { font-weight: 800; color: var(--ink-2) }
+
+/* rakamlar */
+.dgrid { display: grid; grid-template-columns: repeat(8, 1fr); width: min(240px, 70vw); aspect-ratio: 1; gap: 2px; background: #333a52; padding: 2px; border-radius: 8px }
+.dgrid i { background: rgb(calc(var(--v) * 255) calc(var(--v) * 255) calc(var(--v) * 255)); border-radius: 2px; font: 700 11px var(--f-code); font-style: normal; display: grid; place-items: center;
+  color: color-mix(in srgb, #000 calc(var(--v) * 100%), #fff) }
+.dgrid.nums i { font-size: clamp(9px, 2.4vw, 13px) }
+.dgrid.small { width: 64px; padding: 1px; gap: 1px; border-radius: 5px }
+.dg-note { font-weight: 700; color: var(--ink-2); text-align: center }
+.loading-dots { display: flex; gap: 8px } .loading-dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--robot); animation: blinkL 1s infinite }
+.loading-dots i:nth-child(2) { animation-delay: .2s } .loading-dots i:nth-child(3) { animation-delay: .4s }
+.sim-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center }
+.sim-target, .nb-target { display: flex; flex-direction: column; align-items: center; gap: 6px }
+.sim-target .dgrid, .nb-target .dgrid { width: 140px }
+.sim-h { font-weight: 800; color: var(--ink-2) }
+.sim-vs { font: 800 30px var(--f-disp); color: var(--ink-2) }
+.sim-cands { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center }
+.sim-cand { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 14px; border: 3px solid var(--line); background: var(--card); cursor: pointer }
+.sim-cand .dgrid.small { width: 90px }
+.sim-cand.ok { border-color: var(--ok); background: #e3f5ea } .sim-cand.no { border-color: var(--bad); animation: shake .35s }
+.sim-score { font: 800 15px var(--f-code); min-height: 20px }
+.nb-top { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center }
+.nb-votes { display: flex; flex-direction: column; gap: 6px; min-width: 160px }
+.vote { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font: 800 18px var(--f-code) }
+.vote span { height: 18px; width: calc(var(--w) * 140px); background: var(--c, var(--robot)); border-radius: 6px; transition: width .3s }
+.vote i { font-style: normal; font-size: 14px; color: var(--ink-2) }
+.nb-list, .wrongs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center }
+.nb-item { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: pop .3s }
+.nb-item b { font: 800 15px var(--f-code) }
+.nb-item.bad b { color: var(--bad); font-size: 13px }
+.draw-wrap { display: flex; justify-content: center; align-items: center; min-width: 0 }
+.draw { width: min(300px, 100%); aspect-ratio: 1; height: auto; border-radius: 18px; touch-action: none; cursor: crosshair; background: #000; box-shadow: 0 0 0 4px var(--line) }
+.guess { display: flex; align-items: center; gap: 16px }
+.guess-big { font: 800 72px var(--f-disp); color: var(--accent); min-width: 60px; text-align: center }
+.acc { display: flex; align-items: center; gap: 12px; width: min(420px, 100%) }
+.acc-bar { flex: 1; height: 22px; background: var(--line); border-radius: 99px; overflow: hidden }
+.acc-bar span { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; border-radius: 99px }
+.acc-num { font: 800 24px var(--f-code); min-width: 90px }
+.acc-hist { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-weight: 600 }
+
+/* penguenler */
+.peng { width: 70px; height: 82px }
+.peng-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding: 12px }
+.peng-card { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 190px; padding: 12px; border-radius: 16px; border: 3px solid var(--line); background: var(--card); cursor: pointer; font: inherit; color: var(--ink) }
+.peng-card b { font-size: 19px }
+.peng-info { font-size: 14px; color: var(--ink-2); text-align: center; max-height: 0; overflow: hidden; transition: max-height .35s }
+.peng-card.open { border-color: var(--robot) } .peng-card.open .peng-info { max-height: 90px }
+.split { display: flex; flex-direction: column; gap: 4px; width: 100%; max-width: 460px }
+.split-h { font-weight: 800 } .split-h small { color: var(--ink-2); font-weight: 600 }
+.split-bar { display: flex; height: 30px; border-radius: 10px; overflow: hidden; background: var(--line) }
+.split-bar span { width: calc(var(--w) * 100%); background: var(--c); color: #fff; font: 800 14px var(--f-code); display: grid; place-items: center; transition: width .4s }
+.split-q { font: 800 18px var(--f-disp); color: var(--accent) }
+.split-two { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-weight: 700; font-size: 14px }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px }
+.tree { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; overflow-x: auto; padding: 4px }
+.tkids { display: flex; gap: 14px; justify-content: center }
+.tbranch { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; padding-top: 6px; border-top: 3px solid var(--line) }
+.tlab { font-size: 13px; font-weight: 700; color: var(--ink-2) }
+.tnode { padding: 8px 12px; border-radius: 12px; font-weight: 800; white-space: nowrap; animation: pop .3s }
+.tnode.q { background: var(--card); border: 3px solid var(--ink) }
+.tnode.leaf { background: var(--c); color: #fff }
+.tnode.mixed { background: var(--hl-soft); border: 3px dashed var(--ink-2) }
+.myst { display: flex; align-items: center; gap: 16px }
+.myst .peng { width: 90px; height: 105px }
+.myst-data { display: flex; flex-direction: column; gap: 2px; font-size: 17px }
+.peng.reveal { animation: pop .4s }
+.ask-q { font: 700 22px var(--f-disp); text-align: center }
+.exam { display: flex; flex-direction: column; gap: 14px; width: min(440px, 100%); padding: 10px }
+.exam-row { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 10px; align-items: center; font-weight: 700 }
+.exam-row b { font: 800 20px var(--f-code); min-width: 70px; text-align: right }
+.acc-bar.q span { background: var(--accent); transition: width .8s }
+.forest { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center }
+.ftree { display: flex; flex-direction: column; align-items: center; padding: 8px; border-radius: 14px; background: var(--card); border: 3px solid var(--line); min-width: 92px }
+.ft-ico { font-size: 34px } .ft-vote { font-size: 14px }
+.ftree.voted { border-color: var(--c); animation: pop .3s } .ftree.voted .ft-vote { color: var(--c) }
+.ftree small { color: var(--ink-2); font-size: 12px }
+
+/* K-Means */
+.kpt { fill: #c3cddc; stroke: #fff; stroke-width: 1.5; transition: fill .3s }
+.kln { stroke-width: 1.2; opacity: .35 }
+.kstar { font-size: 26px; stroke: #fff; stroke-width: 1px; paint-order: stroke }
+.house { font-size: 18px }
+.station { font-size: 26px }
+.road-l { stroke-dasharray: 3 4; stroke-width: 2 } .road-l.you { stroke: #4d9bff } .road-l.ai { stroke: var(--ok) }
+.compare { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; font-weight: 600; min-height: 26px }
+.img-pair { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center }
+.img-pair figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px }
+.img-pair figcaption { font-weight: 800; color: var(--ink-2); font-size: 14px }
+.img-pair canvas { width: min(240px, 80vw); height: auto; border-radius: 10px; image-rendering: pixelated }
+.palette { display: flex; gap: 6px } .palette i { width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 0 0 2px var(--card), 0 0 0 3px var(--line) }
+.pop-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: min(460px, 100%) }
+.pop-grid canvas { width: 100%; height: auto; border-radius: 8px; animation: pop .4s }
+.pop-grid:empty { min-height: 160px; border: 3px dashed var(--line); border-radius: 14px }
+label.btn input[hidden] { display: none }

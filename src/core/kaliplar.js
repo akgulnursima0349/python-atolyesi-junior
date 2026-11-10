@@ -105,7 +105,7 @@ export function yazEkrani(ctx, o) {
   calis.onclick = async () => {
     calis.disabled = true; calis.textContent = "Python hazırlanıyor…";
     let r;
-    try { r = await run(ed.value); }
+    try { r = await run(ed.value, o.onek || ""); }
     catch (_) { msg.className = "msg bad"; msg.textContent = "Python yüklenemedi. İnternet bağlantısını kontrol edip tekrar dene."; calis.disabled = false; calis.textContent = "▶ Çalıştır"; return; }
     calis.disabled = false; calis.textContent = "▶ Çalıştır";
     $(".so-lines", st).innerHTML = r.out.map((x) => `<div>${x.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>`).join("");
