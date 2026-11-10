@@ -11,7 +11,7 @@ export function playWorld(world, root, { onExit }) {
   let at = 0, kazanilan = 0;
   root.innerHTML = "";
   const top = el("header", "w-top");
-  const back = el("a", "back", "← Harita"); back.href = "#harita";
+  const back = el("a", "back", "← <span>Harita</span>"); back.href = "#harita"; back.setAttribute("aria-label", "Haritaya dön");
   const title = el("div", "w-title", `<span>Dünya ${world.no}</span>${world.title}`);
   const dots = el("div", "dots"), sc = el("div", "score");
   top.append(back, title, dots, sc, soundButton());
