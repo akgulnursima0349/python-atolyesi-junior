@@ -2,6 +2,8 @@
 import { el, $, $$, wait, hl, txt, codePanel, stepper, varChip, confetti, stars, STAR } from "../core/ui.js";
 import { bitSvg } from "../core/bit.js";
 import { sfx, beep } from "../core/sound.js";
+import { editor } from "../core/editor.js";
+import { run, hazirla } from "../core/python.js";
 
 /* 1 · Tekrar → döngü */
 function kisalt(ctx) {
@@ -96,7 +98,119 @@ function tahmin(ctx) {
   f.actions.prepend(opts);
 }
 
-/* 4 · Listede gezmek */
+/* 4 · Arduino ikizi: aynı döngü iki dilde */
+const PARCA = {
+  1: "<b>int i = 0</b>: sayaç 0'dan başlar. Python'da kendiliğinden!",
+  2: "<b>i &lt; 5</b>: 5'e gelmeden dur. Python'da <b>range(5)</b>.",
+  3: "<b>i++</b>: her tur 1 artır. range bunu kendisi yapar.",
+  4: "<b>{ }</b> yerine Python'da <b>:</b> ve 4 boşluk.",
+  5: "<b>Serial.println</b> yerine Python'da <b>print</b>."
+};
+function arduino(ctx) {
+  const f = ctx.frame("Arduino'daki <b>for</b>'u hatırla! Renkli parçalara dokun.");
+  const sol = el("div", "twin");
+  sol.innerHTML = `<div class="twin-h">Arduino (C++)</div>
+    <div class="code cpp"><div class="ln"><span class="kw">for</span> (<button class="chunk c1" data-k="1">int i = 0</button>; <button class="chunk c2" data-k="2">i &lt; 5</button>; <button class="chunk c3" data-k="3">i++</button>) <button class="chunk c4" data-k="4">{</button></div>
+    <div class="ln">  <button class="chunk c5" data-k="5">Serial.println(i);</button></div><div class="ln"><span class="brace4">}</span></div>
+    <div class="out"><span class="out-label">Seri ekran</span></div></div>
+    <div class="leds">${"<span></span>".repeat(5)}</div>`;
+  const sag = el("div", "twin");
+  sag.innerHTML = `<div class="twin-h">Python</div>
+    <div class="code"><div class="ln"><span class="kw">for</span> <span class="pk" data-k="1 3">i</span> <span class="kw">in</span> <span class="pk" data-k="2 3"><span class="fn">range</span>(<span class="nu">5</span>)</span><span class="pk" data-k="4">:</span></div>
+    <div class="ln"><span class="pk" data-k="4">    </span><span class="pk" data-k="5"><span class="fn">print</span>(i)</span></div>
+    <div class="out"><span class="out-label">Ekran</span></div></div>`;
+  f.grid.append(sol, sag);
+  const bulunan = new Set();
+  const calis = el("button", "btn", "▶ İkisini de çalıştır");
+  calis.hidden = true;
+  f.actions.prepend(calis);
+  $$(".chunk", sol).forEach((b) => {
+    b.onclick = () => {
+      const k = b.dataset.k;
+      $$(".chunk", sol).forEach((x) => x.classList.toggle("on", x === b));
+      $$(".pk", sag).forEach((x) => x.classList.toggle("on", x.dataset.k.split(" ").includes(k)));
+      $$(".pk", sag).forEach((x) => x.classList.toggle("c" + k, x.dataset.k.split(" ").includes(k)));
+      $(".brace4", sol).classList.toggle("on", k === "4");
+      b.classList.add("seen"); bulunan.add(k); sfx.tik(+k);
+      ctx.say(PARCA[k] + (bulunan.size < 5 ? "" : " Hepsini buldun!"), bulunan.size < 5 ? "mutlu" : "vay");
+      if (bulunan.size === 5) calis.hidden = false;
+    };
+  });
+  calis.onclick = async () => {
+    calis.disabled = true;
+    $$(".on", f.grid).forEach((x) => x.classList.remove("on"));
+    const [ca, py] = $$(".code", f.grid), leds = $$(".leds span", sol);
+    const satir = (code, i) => $$(".ln", code).forEach((d, k) => d.classList.toggle("hl", k === i));
+    const yaz = (code, t) => $(".out", code).append(el("span", "o", t));
+    $$(".o", f.grid).forEach((x) => x.remove()); leds.forEach((l) => l.classList.remove("lit"));
+    for (let i = 0; i < 5; i++) {
+      satir(ca, 0); satir(py, 0); await wait(300);
+      satir(ca, 1); satir(py, 1); yaz(ca, i); yaz(py, i); leds[i].classList.add("lit"); sfx.tik(i); await wait(350);
+    }
+    satir(ca, -1); satir(py, -1);
+    ctx.say("İki dil, <b>aynı</b> 5 tur! Python'da daha kısa.", "vay");
+    f.done(1, STAR + " ikizleri buldun");
+    calis.disabled = false;
+  };
+}
+
+/* 7 · Yaz: tek satırı çocuk yazar */
+const IPUCU = [
+  "Kumbarayı hatırla: her turda <b>kumbara</b> büyüyordu.",
+  "Satır şöyle başlar: <code>toplam = toplam + ...</code>",
+  "Cevap: <code>toplam = toplam + sayi</code>"
+];
+function yaz(ctx) {
+  const f = ctx.frame("Sıra sende! <b>1'den 10'a</b> kadar sayıları topla.");
+  hazirla().catch(() => {});
+  const bas = "toplam = 0\nfor sayi in range(1, 11):\n    # buraya bir satır yaz\nprint(toplam)";
+  const ed = editor(bas, { satir: 5 });
+  const sol = el("div", "write");
+  sol.append(ed);
+  const st = el("div", "stage");
+  st.innerHTML = `<div class="chips"><div class="chip">sayi = <em>1 → 10</em></div><div class="chip">hedef = <em>55</em></div></div><div class="col-center">${bitSvg("mutlu", "bit bit-xl")}<div class="screen-out" aria-live="polite"><span class="out-label">Ekran</span><div class="so-lines"></div></div></div>`;
+  f.grid.append(sol, st);
+  const msg = el("div", "msg");
+  const calis = el("button", "btn", "▶ Çalıştır"), ipucuB = el("button", "btn sec", "💡 İpucu");
+  ipucuB.hidden = true;
+  f.actions.prepend(calis, ipucuB);
+  f.grid.after(msg);
+  let deneme = 0, ipucu = 0;
+  const bit = (m) => { $(".bit", st).outerHTML = bitSvg(m, "bit bit-xl"); };
+  const basarisiz = () => { deneme++; if (deneme >= 3) ipucuB.hidden = false; };
+  ipucuB.onclick = () => {
+    msg.className = "msg hint"; msg.innerHTML = "💡 " + IPUCU[Math.min(ipucu, 2)];
+    if (ipucu >= 2) {
+      const kopya = el("button", "btn sec small", "Kutuya yaz");
+      kopya.onclick = () => { ed.value = bas.replace("    # buraya bir satır yaz", "    toplam = toplam + sayi"); ed.focus(); };
+      msg.append(" ", kopya);
+    }
+    ipucu++;
+  };
+  calis.onclick = async () => {
+    calis.disabled = true; calis.textContent = "Python hazırlanıyor…";
+    let r;
+    try { r = await run(ed.value); }
+    catch (_) { msg.className = "msg bad"; msg.textContent = "Python yüklenemedi. İnternet bağlantısını kontrol edip tekrar dene."; calis.disabled = false; calis.textContent = "▶ Çalıştır"; return; }
+    calis.disabled = false; calis.textContent = "▶ Çalıştır";
+    $(".so-lines", st).innerHTML = r.out.map((o) => `<div>${o.replace(/</g, "&lt;")}</div>`).join("");
+    if (r.hata) {
+      msg.className = "msg bad"; msg.innerHTML = (r.hata.satir ? `<b>${r.hata.satir}. satır:</b> ` : "") + r.hata.mesaj;
+      bit("uzgun"); sfx.yanlis(); basarisiz(); return;
+    }
+    const son = r.out[r.out.length - 1];
+    if (son === "55") {
+      msg.className = "msg ok"; msg.innerHTML = "Harika! 1 + 2 + ... + 10 = <b>55</b>.";
+      bit("vay"); ctx.say("Kendi kodunu <b>yazdın</b>! Döngü 10 tur toplama yaptı.", "vay");
+      f.done(2, stars(2) + " kod yazdın"); return;
+    }
+    msg.className = "msg bad";
+    msg.innerHTML = son === undefined ? "Ekrana hiçbir şey çıkmadı. <code>print</code> satırı duruyor mu?" : son === "0" ? "Ekranda <b>0</b> çıktı: döngünün içinde toplam hiç büyümedi." : `Ekranda <b>${son.replace(/</g, "&lt;")}</b> çıktı. <b>55</b> olmalıydı.`;
+    bit("uzgun"); sfx.yanlis(); basarisiz();
+  };
+}
+
+/* 5 · Listede gezmek */
 function meyve(ctx) {
   const f = ctx.frame("Sepete meyve ekle. Döngü hepsini <b>tek tek</b> yıkasın!");
   const sepet = ["🍎", "🍌"];
@@ -139,7 +253,7 @@ function meyve(ctx) {
   };
 }
 
-/* 5 · Biriktirmek */
+/* 6 · Biriktirmek */
 function kumbara(ctx) {
   const f = ctx.frame("Her turda kumbaraya <b>para</b> düşüyor. Adım adım izle!");
   const paralar = [5, 10, 2, 20];
@@ -178,7 +292,7 @@ function kumbara(ctx) {
   };
 }
 
-/* 6 · Görev: Bit'i yıldıza götür (iki seviye) */
+/* 8 · Görev: Bit'i yıldıza götür (iki seviye) */
 const SEVIYE = [
   { w: 7, h: 3, start: [0, 1], star: [5, 1], walls: [], body: ["    ileri()"], moves: [[1, 0]], text: "Görev: Bit'i <b>yıldıza</b> götür. Kaç adım?" },
   { w: 6, h: 5, start: [0, 4], star: [4, 0], walls: [[2, 4], [3, 4], [4, 4], [5, 4], [3, 3], [4, 3], [5, 3], [4, 2], [5, 2], [5, 1]], body: ["    ileri()", "    yukari()"], moves: [[1, 0], [0, -1]], text: "Zor görev: merdiveni çık! Döngüde <b>iki</b> komut var." }
@@ -257,6 +371,6 @@ function gorev(ctx) {
 
 export const dongu = {
   id: "dongu", no: 4, title: "Döngü Robotu", icon: "🔁", color: "#22a6a0",
-  screens: [kisalt, pist, tahmin, meyve, kumbara, gorev],
-  ozet: ["for i in range(5): → 5 tur, 0'dan 4'e", "for meyve in sepet: → listeyi tek tek gez", "toplam = toplam + sayi → biriktir"]
+  screens: [kisalt, pist, tahmin, arduino, meyve, kumbara, yaz, gorev],
+  ozet: ["for i in range(5): → 5 tur, 0'dan 4'e", "Arduino: for (int i = 0; i < 5; i++) → aynı 5 tur", "for meyve in sepet: → listeyi tek tek gez", "toplam = toplam + sayi → biriktir"]
 };

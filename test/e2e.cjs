@@ -18,6 +18,7 @@ const ok = (kosul, ad) => { console.log(`${kosul ? "  ✓" : "  ✗"} ${ad}`); i
 
 async function oyna(p, shot) {
   // 1 kısalt
+  ok(await p.isHidden(".next"), "Devam düğmesi iş bitmeden gizli");
   await p.click("text=Döngüyle kısalt"); await p.waitForSelector(".next:not([hidden])", { timeout: 15000 }); await shot("1"); await p.click(".next");
   // 2 pist: iki farklı sayı
   await p.click("text=▶ Koş"); await p.waitForSelector("text=▶ Tekrar koş", { timeout: 15000 });
@@ -26,12 +27,33 @@ async function oyna(p, shot) {
   // 3 tahmin: önce yanlış, sonra doğru
   await p.click(".opt >> nth=0"); ok(await p.isVisible(".opt.no"), "yanlış tahminde ipucu"); await p.click(".opt >> nth=1");
   await p.waitForSelector(".next:not([hidden])", { timeout: 10000 }); await p.click(".next");
-  // 4 meyve
+  // Arduino ikizi: 5 parçaya dokun, çalıştır
+  ok(await p.isHidden("text=İkisini de çalıştır"), "eşleştirme bitmeden çalıştır düğmesi gizli");
+  for (let k = 1; k <= 5; k++) { await p.click(`.chunk[data-k="${k}"]`); if (k === 2) ok((await p.$$(".pk.on")).length >= 1, "Arduino parçası Python karşılığını yakıyor"); }
+  await p.click("text=İkisini de çalıştır"); await p.waitForSelector(".next:not([hidden])", { timeout: 10000 });
+  ok((await p.$$(".leds .lit")).length === 5, "5 LED yandı"); await shot("3b"); await p.click(".next");
+  // meyve
   await p.click(".add button >> nth=0"); await p.click("text=▶ Çalıştır"); await p.waitForTimeout(700); await shot("4");
   await p.waitForSelector(".next:not([hidden])", { timeout: 20000 }); await p.click(".next");
   // 5 kumbara
   for (let i = 0; i < 9; i++) { await p.click("text=Bir adım"); await p.waitForTimeout(80); await p.waitForFunction(() => { const b = [...document.querySelectorAll(".btn")].find((x) => /Bir adım/.test(x.textContent)); return !b || !b.disabled || b.hidden; }); }
-  await p.waitForSelector(".next:not([hidden])", { timeout: 5000 }); await shot("5"); await p.click(".next");
+  await p.waitForSelector(".next:not([hidden])", { timeout: 5000 }); await shot("5");
+  ok(await p.evaluate(() => !window.Sk), "Skulpt Yaz ekranından önce yüklenmedi");
+  await p.click(".next");
+  // Yaz: önce dokunmadan çalıştır, sonra yanlış, sonra sonsuz döngü, ipucu, doğru
+  await p.click("text=▶ Çalıştır"); await p.waitForSelector(".msg.bad", { timeout: 20000 });
+  ok(/en az .*bir komut/.test(await p.textContent(".msg")), "boş döngü gövdesi için Türkçe mesaj: " + (await p.textContent(".msg")));
+  await p.fill(".editor", "toplam = 0\nfor sayi in range(1, 11):\n    toplam = toplam + 1\nprint(toplam)");
+  await p.click("text=▶ Çalıştır"); await p.waitForFunction(() => /10/.test(document.querySelector(".msg").textContent));
+  ok(/55/.test(await p.textContent(".msg")), "yanlış sonuçta hedef söyleniyor");
+  await p.fill(".editor", "toplam = 0\nwhile True:\n    toplam = toplam + 1\nprint(toplam)");
+  await p.click("text=▶ Çalıştır"); await p.waitForFunction(() => /durmadı/.test(document.querySelector(".msg").textContent), null, { timeout: 30000 });
+  ok(true, "sonsuz döngü durduruldu ve Türkçe mesaj verildi");
+  ok(await p.isVisible("text=💡 İpucu"), "3 başarısızlıktan sonra ipucu düğmesi çıktı");
+  for (let i = 0; i < 3; i++) await p.click("text=💡 İpucu");
+  await p.click("text=Kutuya yaz"); await p.click("text=▶ Çalıştır");
+  await p.waitForSelector(".msg.ok", { timeout: 10000 }); await shot("yaz"); ok(true, "ipucu çözümü 55 verdi");
+  await p.click(".next");
   // 6 görev: önce eksik, sonra doğru; zor görev
   await p.click("text=▶ Çalıştır"); await p.waitForSelector("text=▶ Tekrar dene", { timeout: 10000 });
   ok(/ulaşamadı/.test(await p.textContent(".bubble")), "eksik adımda Bit uyarıyor");
@@ -70,7 +92,7 @@ async function oyna(p, shot) {
     await p.waitForSelector('.node[data-no="4"].bitti');
     ok(true, "Dünya 4 haritada bitti görünüyor");
     const yildiz = Number(await p.textContent(".m-top .score span"));
-    ok(yildiz === 10, `toplam yıldız 10 (bulunan ${yildiz})`);
+    ok(yildiz === 13, `toplam yıldız 13 (bulunan ${yildiz})`);
 
     // ses tercihi ve yenileme sonrası kalıcılık
     await p.click(".icon-btn"); await p.reload(); await p.waitForSelector(".node");

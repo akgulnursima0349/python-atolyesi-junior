@@ -11,6 +11,7 @@
   --r: 18px;
 }
 * { box-sizing: border-box }
+[hidden] { display: none !important }
 html, body { min-height: 100% }
 body { margin: 0; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 60%) fixed, var(--bg); color: var(--ink);
   font: 400 17px/1.45 var(--f-disp);
@@ -183,6 +184,36 @@ button { font-family: inherit }
 .mover { position: absolute; transition: left .45s ease, top .45s ease; z-index: 2; pointer-events: none }
 .mover .bit { width: 100%; height: 100% }
 .mover.bump { animation: shake .35s }
+
+/* Arduino ikizi */
+.twin { display: flex; flex-direction: column; gap: 8px; min-width: 0 }
+.twin-h { font-weight: 800; font-size: 15px; color: var(--ink-2) }
+.twin .code { min-height: 0; flex: 1 }
+.chunk { font: inherit; color: var(--code-fg); background: rgba(255, 255, 255, .08); border: 2px solid var(--cc); border-radius: 8px; padding: 0 4px; cursor: pointer; margin: 1px 0 }
+.chunk.seen { background: color-mix(in srgb, var(--cc) 25%, transparent) }
+.chunk.on, .pk.on, .brace4.on { background: var(--cc); color: #1b2440; border-radius: 6px }
+.pk { border-radius: 6px; transition: background .2s; white-space: pre }
+.pk.on .fn, .pk.on .nu, .pk.on .kw { color: #1b2440 }
+.c1 { --cc: #7fd6ff } .c2 { --cc: #ffd84d } .c3 { --cc: #b7f08a } .c4 { --cc: #ff9fb3 } .c5 { --cc: #c6a8ff }
+.brace4 { --cc: #ff9fb3; padding: 0 3px }
+.leds { display: flex; gap: 10px; justify-content: center; padding: 6px }
+.leds span { width: 26px; height: 26px; border-radius: 50%; background: #c9d4e3; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12); transition: background .2s, box-shadow .2s }
+.leds span.lit { background: #ff4d4d; box-shadow: 0 0 14px 4px rgba(255, 77, 77, .55) }
+
+/* Yaz ekranı */
+.write { display: flex; flex-direction: column; min-width: 0 }
+.editor { width: 100%; min-height: 200px; flex: 1; resize: vertical; background: var(--code-bg); color: var(--code-fg); caret-color: var(--hl); border: 3px solid transparent;
+  border-radius: var(--r); padding: 16px 18px; font: 500 clamp(15px, 2vw, 19px)/1.7 var(--f-code); tab-size: 4; white-space: pre; overflow-x: auto }
+.editor:focus { outline: none; border-color: var(--hl) }
+.screen-out { background: var(--code-bg); color: var(--code-fg); border-radius: 14px; padding: 8px 16px; min-width: 160px; font: 700 22px/1.4 var(--f-code); text-align: center }
+.screen-out .out-label { color: var(--code-dim) }
+.msg { border-radius: 14px; padding: 12px 16px; font-weight: 600; font-size: 17px }
+.msg:empty { display: none }
+.msg.bad { background: #fde9ea; color: #8d1f24 }
+.msg.ok { background: #e3f5ea; color: #1d6b3c }
+.msg.hint { background: var(--hl-soft) }
+.msg code { font-family: var(--f-code); background: rgba(27, 36, 64, .08); padding: 1px 6px; border-radius: 6px }
+.btn.small { font-size: 15px; padding: 8px 14px }
 
 /* dünya sonu */
 .end { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0 }
