@@ -1,0 +1,212 @@
+/* Düzen: tek sütun; harita bir yol, dünya ekranı tek kart (solda kod, sağda canlı sahne).
+   Tek, açık tema: bilerek koyu tema yok; koyu renk yalnızca kod panelinde. */
+:root {
+  color-scheme: light;
+  --bg: #eaf4fd; --bg-2: #f6fbff; --card: #ffffff; --ink: #1b2440; --ink-2: #5c6987; --line: #d6e3f2;
+  --accent: #ff6b3d; --accent-2: #d9542b; --robot: #22a6a0; --robot-2: #188a85;
+  --hl: #ffd84d; --hl-soft: #fff4c7; --ok: #2f9e5a; --bad: #e0464b; --path: #b8cde6; --track: #dbe6f3;
+  --code-bg: #1b2440; --code-fg: #eef2ff; --code-dim: #94a2c4; --code-row: #26325a;
+  --f-disp: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-code: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 18px;
+}
+* { box-sizing: border-box }
+html, body { min-height: 100% }
+body { margin: 0; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 60%) fixed, var(--bg); color: var(--ink);
+  font: 400 17px/1.45 var(--f-disp);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 28px }
+#app { max-width: 1060px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px }
+a { color: inherit }
+button { font-family: inherit }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px }
+.star { width: 22px; height: 22px; flex: none; vertical-align: -4px }
+
+/* ---------- üst şeritler ---------- */
+.m-top, .w-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 48px }
+.brand { font-weight: 800; font-size: 20px; letter-spacing: -.01em; margin-right: auto }
+.brand span { color: var(--accent) }
+.score { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; background: var(--card);
+  padding: 6px 12px; border-radius: 99px; box-shadow: 0 2px 0 var(--line) }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--card); color: var(--ink); cursor: pointer;
+  display: grid; place-items: center; box-shadow: 0 2px 0 var(--line) }
+.icon-btn svg { width: 22px; height: 22px }
+.back { font-weight: 700; text-decoration: none; background: var(--card); padding: 9px 14px; border-radius: 99px; box-shadow: 0 2px 0 var(--line); white-space: nowrap }
+.teacher-tag { font-size: 13px; font-weight: 700; text-decoration: none; background: var(--hl); padding: 5px 10px; border-radius: 99px }
+.w-title { display: flex; flex-direction: column; font-weight: 800; font-size: 18px; line-height: 1.15; min-width: 0 }
+.w-title span { font-size: 12px; font-weight: 600; color: var(--ink-2); letter-spacing: .08em; text-transform: uppercase }
+.dots { display: flex; gap: 6px; flex: 1; min-width: 140px }
+.dot { flex: 1; height: 10px; border-radius: 99px; background: var(--line); transition: background .3s }
+.dot.on { background: var(--robot) }
+.dot.now { background: var(--accent) }
+@media (max-width: 640px) { .w-top .dots { order: 5; flex-basis: 100% } .w-title { margin-right: auto } }
+
+/* ---------- Bit ve balon ---------- */
+.say { display: flex; align-items: center; gap: 14px }
+.bit { width: 64px; height: 64px; flex: none }
+.bit-xl { width: 120px; height: 120px }
+.eye { transform-origin: center; transform-box: fill-box; animation: blink 4s infinite }
+.bubble { position: relative; background: var(--hl-soft); border-radius: 18px; padding: 12px 18px; font-size: clamp(19px, 2.6vw, 24px);
+  font-weight: 600; line-height: 1.3; text-wrap: balance; min-width: 0; animation: pop .3s }
+.bubble::before { content: ""; position: absolute; left: -9px; top: 50%; margin-top: -9px; border: 9px solid transparent; border-left: 0; border-right-color: var(--hl-soft) }
+.bubble b { color: var(--accent-2) }
+@media (max-width: 640px) { .bit { width: 50px; height: 50px } .bubble { font-size: 18px; padding: 10px 14px } }
+
+/* ---------- harita ---------- */
+.map-hello { background: var(--card); border-radius: 24px; padding: 14px 18px; box-shadow: 0 2px 0 var(--line) }
+.map { position: relative; display: flex; flex-direction: column; gap: 6px; padding-block: 10px 20px }
+.map-path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none }
+.m-row { position: relative; height: 150px }
+.node { position: absolute; left: calc(var(--x) * 100%); top: 0; transform: translateX(-50%); width: 170px; border: 0; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink); padding: 0 }
+.orb { position: relative; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: var(--c);
+  box-shadow: inset 0 -8px 0 rgba(0, 0, 0, .14), 0 6px 0 rgba(27, 36, 64, .08); transition: transform .15s }
+.node:hover .orb { transform: translateY(-3px) }
+.ico { font-size: 42px; line-height: 1 }
+.ico svg { width: 34px; height: 34px; color: #fff }
+.no { position: absolute; top: -4px; right: -4px; width: 30px; height: 30px; border-radius: 50%; background: var(--card); color: var(--ink);
+  font-weight: 800; font-size: 14px; display: grid; place-items: center; box-shadow: 0 2px 0 var(--line) }
+.n-title { font-weight: 700; font-size: 15px; line-height: 1.2; text-align: center; text-wrap: balance; background: var(--card); padding: 3px 10px; border-radius: 10px }
+.n-state { font-size: 13px; font-weight: 700; color: var(--ink-2); display: inline-flex; gap: 2px; min-height: 22px; align-items: center }
+.n-state .star { width: 20px; height: 20px }
+.node.acik .orb { animation: glow 1.8s ease-in-out infinite }
+.node.acik .n-state { color: #fff; background: var(--accent); padding: 2px 12px; border-radius: 99px }
+.node.kilitli .orb { background: #c9d4e3 }
+.node.kilitli .n-title, .node.hazirlaniyor .n-title { color: var(--ink-2) }
+.node.hazirlaniyor .orb { background: var(--card); border: 3px dashed var(--path); box-shadow: none }
+.node.hazirlaniyor .ico { opacity: .45; filter: grayscale(.6) }
+.m-foot { text-align: center; font-size: 14px; color: var(--ink-2) }
+@media (max-width: 520px) { .node { width: 132px } .orb { width: 78px; height: 78px } .ico { font-size: 34px } .m-row { height: 140px } .node { left: calc(18% + var(--x) * 64%) } }
+
+/* ---------- dünya kartı ---------- */
+.card { background: var(--card); border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 2px 0 var(--line), 0 18px 40px -26px rgba(27, 36, 64, .35) }
+.card.narrow { max-width: 620px; width: 100%; margin: 0 auto }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: stretch }
+@media (max-width: 780px) { .grid { grid-template-columns: 1fr } }
+@media (max-width: 640px) { .card { padding: 14px; border-radius: 20px } }
+
+/* kod paneli */
+.code { background: var(--code-bg); color: var(--code-fg); border-radius: var(--r); padding: 14px 0; font: 500 clamp(15px, 2vw, 19px)/1.7 var(--f-code);
+  overflow-x: auto; display: flex; flex-direction: column; justify-content: center; min-height: 150px }
+.ln { padding: 0 18px; white-space: pre; border-left: 5px solid transparent; transition: background .2s, opacity .25s, transform .25s }
+.ln.hl { background: rgba(255, 216, 77, .18); border-left-color: var(--hl) }
+.ln.gone { opacity: 0; transform: translateY(-12px) }
+.kw { color: #ff9d7a } .fn { color: #7fd6ff } .st { color: #b7f08a } .nu { color: #ffd84d } .cm { color: var(--code-dim) }
+.num-btn { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle }
+.num-btn button { width: 34px; height: 34px; border-radius: 10px; border: 0; background: #33416b; color: #fff; font: 700 20px/1 var(--f-disp); cursor: pointer; touch-action: manipulation }
+.num-btn button:hover { background: #42548a }
+.num-btn button:disabled { opacity: .4 }
+.num-btn output { min-width: 34px; text-align: center; color: var(--hl); font-weight: 700; background: rgba(255, 216, 77, .14); border-radius: 8px; padding: 0 6px; display: inline-block }
+.out { margin-top: 10px; border-top: 1px dashed #3a4870; padding: 10px 18px 0; color: var(--code-dim); font-size: .85em; min-height: 2.2em;
+  display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; white-space: normal }
+.out .o { color: var(--code-fg); background: var(--code-row); border-radius: 7px; padding: 0 8px; animation: pop .35s }
+.out-label { font-family: var(--f-disp); font-size: 12px; letter-spacing: .08em; text-transform: uppercase }
+
+/* canlı sahne */
+.stage { position: relative; background: #eaf7f6; border-radius: var(--r); min-height: 270px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; border: 2px solid #c6e9e6 }
+.stage.tall { min-height: 300px }
+.col-center { display: flex; flex-direction: column; align-items: center; gap: 8px }
+.big-count { font: 800 46px var(--f-disp); color: var(--ink-2) }
+.big-count.win { color: var(--accent); animation: pop .4s }
+.jumpy { transition: transform .2s }
+.hop { transform: translateY(-16px) }
+.chip { position: absolute; top: 12px; left: 12px; background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 4px 12px;
+  font: 700 18px/1.4 var(--f-code); box-shadow: 3px 3px 0 var(--ink); z-index: 3; white-space: nowrap }
+.chip em { font-style: normal; color: var(--accent-2) }
+.chip.flash { animation: flash .45s }
+.chips { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; gap: 8px; flex-wrap: wrap; z-index: 3 }
+.chips .chip { position: static }
+
+/* alt düğmeler */
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+.actions.center { justify-content: center }
+.btn { font: 700 18px/1 var(--f-disp); border: 0; border-radius: 14px; padding: 14px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #fff; text-decoration: none; box-shadow: 0 4px 0 var(--accent-2); transition: transform .08s; touch-action: manipulation }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-2) }
+.btn.sec { background: var(--card); color: var(--ink); box-shadow: 0 4px 0 var(--line); border: 2px solid var(--line) }
+.btn.warn { background: var(--bad); color: #fff; border-color: var(--bad); box-shadow: 0 4px 0 #a92f33 }
+.btn:disabled { opacity: .45; cursor: default }
+.next { margin-left: auto; background: var(--robot); box-shadow: 0 4px 0 var(--robot-2) }
+.next:active { box-shadow: 0 1px 0 var(--robot-2) }
+.badge { white-space: nowrap; font-weight: 700; color: var(--ok); display: inline-flex; gap: 4px; align-items: center; animation: pop .4s }
+
+.opts { display: flex; gap: 10px; flex-wrap: wrap }
+.opt { font: 700 20px/1 var(--f-code); padding: 14px 18px; border-radius: 14px; border: 3px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer }
+.opt:hover:not(:disabled) { border-color: var(--robot) }
+.opt.ok { border-color: var(--ok); background: #e3f5ea }
+.opt.no { border-color: var(--bad); background: #fde9ea; animation: shake .35s }
+
+/* pist */
+.track { width: min(100%, 340px); aspect-ratio: 1; max-width: 100% }
+.lapnum { font: 800 15px var(--f-disp); fill: var(--ink-2) }
+.lap-big { font: 800 40px var(--f-disp); fill: var(--accent) }
+
+/* tahmin basamakları */
+.steps { display: flex; gap: 12px; align-items: flex-end }
+.step-bar { width: 56px; background: var(--robot); border-radius: 10px 10px 4px 4px; color: #fff; font: 800 24px var(--f-code); display: grid; place-items: center; animation: pop .3s }
+
+/* meyve bandı */
+.belt { position: absolute; left: 0; right: 0; bottom: 64px; height: 26px; background: repeating-linear-gradient(90deg, #9fb0cc 0 16px, transparent 16px 28px);
+  animation: belt .6s linear infinite paused }
+.belt.go { animation-play-state: running }
+.machine { position: absolute; right: 18px; bottom: 54px; width: 96px; height: 120px; border-radius: 16px; background: var(--robot); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font: 700 13px var(--f-disp); gap: 4px; box-shadow: inset 0 -10px 0 var(--robot-2) }
+.m-eyes { display: flex; gap: 14px } .m-eyes span { width: 10px; height: 10px; border-radius: 50%; background: #fff }
+.mouth { width: 60px; height: 22px; background: var(--code-bg); border-radius: 0 0 30px 30px }
+.machine.eat { animation: chomp .35s }
+.fruit { position: absolute; font-size: 42px; line-height: 1; bottom: 84px; transition: left .9s cubic-bezier(.5, 0, .4, 1), transform .3s, opacity .3s }
+.fruit.eaten { transform: scale(.2); opacity: 0 }
+.basket { position: absolute; left: 14px; right: 14px; top: 64px; display: flex; gap: 6px; flex-wrap: wrap }
+.cell { width: 46px; height: 46px; border-radius: 10px; border: 2px dashed var(--ink-2); display: grid; place-items: center; font-size: 28px; background: var(--card) }
+.cell.cur { border: 3px solid var(--accent); background: var(--hl-soft) }
+.cell.done { opacity: .3 }
+.add { display: flex; gap: 8px; flex-wrap: wrap }
+.add button { font-size: 28px; width: 54px; height: 54px; border-radius: 14px; border: 2px solid var(--line); background: var(--card); cursor: pointer; touch-action: manipulation }
+.add button:hover:not(:disabled) { border-color: var(--accent) }
+
+/* kumbara */
+.piggy { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); width: 170px; max-width: 60% }
+.coin { position: absolute; left: 50%; top: 60px; width: 54px; height: 54px; margin-left: -27px; border-radius: 50%; background: var(--hl); color: #3a2c00;
+  font: 800 20px/54px var(--f-disp); text-align: center; box-shadow: inset 0 -5px 0 #e0b400; transition: top .7s cubic-bezier(.5, 0, .9, .6), opacity .2s; z-index: 2 }
+.coin.drop { top: 160px }
+.coin.in { opacity: 0 }
+.sum { position: absolute; right: 14px; top: 64px; font: 700 18px var(--f-code); color: var(--ink-2); text-align: right }
+.sum b { color: var(--accent); font-size: 26px; display: block }
+
+/* labirent */
+.maze { display: grid; gap: 6px; padding: 14px; width: 100% }
+.tile { aspect-ratio: 1; border-radius: 10px; background: #d5eeec; position: relative; display: grid; place-items: center }
+.tile .star { width: 70%; height: 70% }
+.tile.wall { background: #b9c6d8 }
+.tile.trail::after { content: ""; width: 26%; aspect-ratio: 1; border-radius: 50%; background: var(--accent); opacity: .5 }
+.mover { position: absolute; transition: left .45s ease, top .45s ease; z-index: 2; pointer-events: none }
+.mover .bit { width: 100%; height: 100% }
+.mover.bump { animation: shake .35s }
+
+/* dünya sonu */
+.end { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0 }
+.end h2 { font-size: clamp(26px, 5vw, 40px); margin: 0; text-wrap: balance }
+.end-stars { margin: 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: center; font-size: 20px }
+.end-stars b { margin-left: 8px }
+.end ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; font: 600 16px var(--f-code); max-width: 100% }
+.end li { background: var(--code-bg); color: var(--code-fg); padding: 8px 14px; border-radius: 12px; overflow-wrap: anywhere }
+
+/* öğretmen */
+.t-form { display: flex; flex-direction: column; gap: 8px }
+.t-form label { font-weight: 700 }
+.t-form .row { display: flex; gap: 10px; flex-wrap: wrap }
+.t-form input { flex: 1; min-width: 0; font: 600 20px var(--f-code); padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); text-transform: uppercase; letter-spacing: .06em }
+.t-form input:focus { border-color: var(--robot); outline: none }
+.danger { border-top: 1px dashed var(--line); padding-top: 14px }
+
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50 }
+
+@keyframes pop { from { transform: scale(.6); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes flash { 0% { background: var(--hl) } 100% { background: var(--card) } }
+@keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
+@keyframes belt { to { background-position: 28px 0 } }
+@keyframes chomp { 50% { transform: scaleY(.85) } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1) } 95% { transform: scaleY(.1) } }
+@keyframes glow { 0%, 100% { box-shadow: inset 0 -8px 0 rgba(0, 0, 0, .14), 0 0 0 0 rgba(255, 107, 61, .55) } 50% { box-shadow: inset 0 -8px 0 rgba(0, 0, 0, .14), 0 0 0 14px rgba(255, 107, 61, 0) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important } }
