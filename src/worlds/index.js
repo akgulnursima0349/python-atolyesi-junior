@@ -3,6 +3,8 @@ import { dongu } from "./dongu.js";
 import { dil } from "./dil.js";
 import { ilk } from "./ilk.js";
 import { karar } from "./karar.js";
+import { listeDunyasi } from "./liste.js";
+import { fonk } from "./fonk.js";
 import { store } from "../core/store.js";
 
 export const WORLDS = [
@@ -10,8 +12,8 @@ export const WORLDS = [
   ilk,
   karar,
   dongu,
-  { id: "liste", no: 5, title: "Vagonlar ve Dolaplar", icon: "🚃", color: "#ff8fab", screens: null },
-  { id: "fonk", no: 6, title: "Makineler ve Fabrikalar", icon: "🏭", color: "#8fd694", screens: null },
+  listeDunyasi,
+  fonk,
   { id: "yz", no: 7, title: "Yapay Zekânın Alet Çantası", icon: "🧰", color: "#ffd84d", screens: null },
   { id: "rakam", no: 8, title: "Rakam Okuyan Yapay Zekâ", icon: "✏️", color: "#7fd6d1", screens: null },
   { id: "penguen", no: 9, title: "Penguen Dedektifi", icon: "🐧", color: "#9fb8ff", screens: null },
