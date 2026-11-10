@@ -1,11 +1,14 @@
 /* Kursun 10 dünyası. screens: null → içerik henüz hazırlanıyor (haritada görünür, sırada atlanır). */
 import { dongu } from "./dongu.js";
+import { dil } from "./dil.js";
+import { ilk } from "./ilk.js";
+import { karar } from "./karar.js";
 import { store } from "../core/store.js";
 
 export const WORLDS = [
-  { id: "dil", no: 1, title: "Bilgisayarın Dili", icon: "💡", color: "#ffb347", screens: null },
-  { id: "ilk", no: 2, title: "Python'un İlk Sözleri", icon: "💬", color: "#7fc8ff", screens: null },
-  { id: "karar", no: 3, title: "Karar Veren Robot", icon: "🔀", color: "#b39dff", screens: null },
+  dil,
+  ilk,
+  karar,
   dongu,
   { id: "liste", no: 5, title: "Vagonlar ve Dolaplar", icon: "🚃", color: "#ff8fab", screens: null },
   { id: "fonk", no: 6, title: "Makineler ve Fabrikalar", icon: "🏭", color: "#8fd694", screens: null },

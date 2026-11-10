@@ -2,8 +2,7 @@
 import { el, $, $$, wait, hl, txt, codePanel, stepper, varChip, confetti, stars, STAR } from "../core/ui.js";
 import { bitSvg } from "../core/bit.js";
 import { sfx, beep } from "../core/sound.js";
-import { editor } from "../core/editor.js";
-import { run, hazirla } from "../core/python.js";
+import { yazEkrani } from "../core/kaliplar.js";
 
 /* 1 · Tekrar → döngü */
 function kisalt(ctx) {
@@ -154,62 +153,6 @@ function arduino(ctx) {
   };
 }
 
-/* 7 · Yaz: tek satırı çocuk yazar */
-const IPUCU = [
-  "Kumbarayı hatırla: her turda <b>kumbara</b> büyüyordu.",
-  "Satır şöyle başlar: <code>toplam = toplam + ...</code>",
-  "Cevap: <code>toplam = toplam + sayi</code>"
-];
-function yaz(ctx) {
-  const f = ctx.frame("Sıra sende! <b>1'den 10'a</b> kadar sayıları topla.");
-  hazirla().catch(() => {});
-  const bas = "toplam = 0\nfor sayi in range(1, 11):\n    # buraya bir satır yaz\nprint(toplam)";
-  const ed = editor(bas, { satir: 5 });
-  const sol = el("div", "write");
-  sol.append(ed);
-  const st = el("div", "stage");
-  st.innerHTML = `<div class="chips"><div class="chip">sayi = <em>1 → 10</em></div><div class="chip">hedef = <em>55</em></div></div><div class="col-center">${bitSvg("mutlu", "bit bit-xl")}<div class="screen-out" aria-live="polite"><span class="out-label">Ekran</span><div class="so-lines"></div></div></div>`;
-  f.grid.append(sol, st);
-  const msg = el("div", "msg");
-  const calis = el("button", "btn", "▶ Çalıştır"), ipucuB = el("button", "btn sec", "💡 İpucu");
-  ipucuB.hidden = true;
-  f.actions.prepend(calis, ipucuB);
-  f.grid.after(msg);
-  let deneme = 0, ipucu = 0;
-  const bit = (m) => { $(".bit", st).outerHTML = bitSvg(m, "bit bit-xl"); };
-  const basarisiz = () => { deneme++; if (deneme >= 3) ipucuB.hidden = false; };
-  ipucuB.onclick = () => {
-    msg.className = "msg hint"; msg.innerHTML = "💡 " + IPUCU[Math.min(ipucu, 2)];
-    if (ipucu >= 2) {
-      const kopya = el("button", "btn sec small", "Kutuya yaz");
-      kopya.onclick = () => { ed.value = bas.replace("    # buraya bir satır yaz", "    toplam = toplam + sayi"); ed.focus(); };
-      msg.append(" ", kopya);
-    }
-    ipucu++;
-  };
-  calis.onclick = async () => {
-    calis.disabled = true; calis.textContent = "Python hazırlanıyor…";
-    let r;
-    try { r = await run(ed.value); }
-    catch (_) { msg.className = "msg bad"; msg.textContent = "Python yüklenemedi. İnternet bağlantısını kontrol edip tekrar dene."; calis.disabled = false; calis.textContent = "▶ Çalıştır"; return; }
-    calis.disabled = false; calis.textContent = "▶ Çalıştır";
-    $(".so-lines", st).innerHTML = r.out.map((o) => `<div>${o.replace(/</g, "&lt;")}</div>`).join("");
-    if (r.hata) {
-      msg.className = "msg bad"; msg.innerHTML = (r.hata.satir ? `<b>${r.hata.satir}. satır:</b> ` : "") + r.hata.mesaj;
-      bit("uzgun"); sfx.yanlis(); basarisiz(); return;
-    }
-    const son = r.out[r.out.length - 1];
-    if (son === "55") {
-      msg.className = "msg ok"; msg.innerHTML = "Harika! 1 + 2 + ... + 10 = <b>55</b>.";
-      bit("vay"); ctx.say("Kendi kodunu <b>yazdın</b>! Döngü 10 tur toplama yaptı.", "vay");
-      f.done(2, stars(2) + " kod yazdın"); return;
-    }
-    msg.className = "msg bad";
-    msg.innerHTML = son === undefined ? "Ekrana hiçbir şey çıkmadı. <code>print</code> satırı duruyor mu?" : son === "0" ? "Ekranda <b>0</b> çıktı: döngünün içinde toplam hiç büyümedi." : `Ekranda <b>${son.replace(/</g, "&lt;")}</b> çıktı. <b>55</b> olmalıydı.`;
-    bit("uzgun"); sfx.yanlis(); basarisiz();
-  };
-}
-
 /* 5 · Listede gezmek */
 function meyve(ctx) {
   const f = ctx.frame("Sepete meyve ekle. Döngü hepsini <b>tek tek</b> yıkasın!");
@@ -290,6 +233,25 @@ function kumbara(ctx) {
     }
     b.disabled = false;
   };
+}
+
+/* 7 · Yaz: tek satırı çocuk yazar */
+function yaz(ctx) {
+  yazEkrani(ctx, {
+    soru: "Sıra sende! <b>1'den 10'a</b> kadar sayıları topla.",
+    bas: "toplam = 0\nfor sayi in range(1, 11):\n    # buraya bir satır yaz\nprint(toplam)",
+    yer: "    # buraya bir satır yaz", cozum: "    toplam = toplam + sayi",
+    chips: [["sayi", "1 → 10"], ["hedef", "55"]],
+    ipuclari: ["Kumbarayı hatırla: her turda <b>kumbara</b> büyüyordu.", "Satır şöyle başlar: <code>toplam = toplam + ...</code>", "Cevap: <code>toplam = toplam + sayi</code>"],
+    kontrol: (r) => {
+      const son = r.out[r.out.length - 1];
+      if (son === "55") return { ok: true, mesaj: "Harika! 1 + 2 + ... + 10 = <b>55</b>." };
+      if (son === undefined) return { ok: false, mesaj: "Ekrana hiçbir şey çıkmadı. <code>print</code> satırı duruyor mu?" };
+      if (son === "0") return { ok: false, mesaj: "Ekranda <b>0</b> çıktı: döngünün içinde toplam hiç büyümedi." };
+      return { ok: false, mesaj: `Ekranda <b>${son.replace(/</g, "&lt;")}</b> çıktı. <b>55</b> olmalıydı.` };
+    },
+    basari: "Kendi kodunu <b>yazdın</b>! Döngü 10 tur toplama yaptı."
+  });
 }
 
 /* 8 · Görev: Bit'i yıldıza götür (iki seviye) */
