@@ -62,6 +62,17 @@ async function oynaDongu(p, shot) {
   await p.waitForSelector(".end"); await shot("son");
 }
 
+/* testte cevapları sırayla seç: sayı = seçenek sırası, -1 = Bilmiyorum */
+async function testCoz(p, cevaplar, bas = 0) {
+  for (let i = bas; i < cevaplar.length; i++) {
+    await p.waitForSelector(`.t-no:has-text("${i + 1} / 12")`);
+    if (cevaplar[i] === -1) await p.click(".t-idk"); else await p.click(`.t-opt >> nth=${cevaplar[i]}`);
+    await p.waitForFunction((n) => { const t = document.querySelector(".t-no"); return !t || !t.textContent.startsWith(n + " "); }, i + 1);
+  }
+}
+const ON_CEVAP = [0, 1, 0, 1, -1, 0, 0, 0, 0, 0, 0, 0]; // 4 doğru + bilmiyorum + yalnızca son soru doğru → 5 doğru
+const SON_CEVAP = [2, 0, 1, 0, 2, 3, 1, 2, 2, 0, 1, 1]; // hepsi doğru
+
 const bekleDevam = (p, t = 20000) => p.waitForSelector(".next:not([hidden])", { timeout: t });
 const devam = async (p) => { await bekleDevam(p); await p.click(".next"); };
 
@@ -296,12 +307,29 @@ async function oynaRessam(p, shot, fotograf) {
     const kelime = [];
     await p.exposeFunction("bubbleLog", (t) => kelime.push(t)).catch(() => {});
     await p.evaluate(() => new MutationObserver(() => { const b = document.querySelector(".bubble"); if (b && b.dataset.seen !== b.textContent) { b.dataset.seen = b.textContent; window.bubbleLog(b.textContent); } }).observe(document.body, { childList: true, subtree: true }));
-    const durumlar = await p.$$eval(".node", (n) => n.map((x) => x.className.replace("node ", "")));
+    const durumlar = await p.$$eval(".node[data-no]", (n) => n.map((x) => x.className.replace("node ", "")));
     ok(durumlar.length === 10, "harita 10 dünya gösteriyor");
-    ok(durumlar[0] === "acik" && durumlar.slice(1, 4).every((d) => d === "kilitli"), "yalnızca Dünya 1 açık, 2–4 kilitli");
+    ok((await p.$$(".node")).length === 13, "harita yolunda başlangıç testi, bitiş testi ve sertifika da var");
+    ok(await p.isVisible('.node[data-durak="on"].acik') && durumlar.every((d) => d === "kilitli"), "başta yalnızca başlangıç testi açık, Dünya 1 kilitli");
+    ok(await p.isVisible('.node[data-durak="son"].kilitli') && await p.isVisible('.node[data-durak="sertifika"].kilitli'), "bitiş testi ve sertifika kilitli");
     ok(!(await tasma()), "haritada yatay taşma yok");
-    await p.click('.node[data-no="3"]'); ok(/önceki/.test(await p.textContent(".bubble")), "kilitli dünyaya dokununca Bit uyarıyor");
+    await p.click('.node[data-no="1"]'); ok(/başlangıç testini/.test(await p.textContent(".bubble")), "test çözülmeden Dünya 1'e dokununca Bit uyarıyor");
+    await p.goto(URL + "#test-son"); await p.waitForSelector(".node"); ok(true, "kilitli bitiş testinin adresi haritaya döndürüyor");
     ok(durumlar.every((d) => d !== "hazirlaniyor"), "hazırlanıyor durumunda dünya kalmadı");
+
+    // başlangıç testi: 3 soru, yenile, kaldığı yerden devam
+    await p.click('.node[data-durak="on"]'); await p.waitForSelector("text=Başla ➜"); await shot("test_giris"); await p.click("text=Başla ➜");
+    ok(await p.isHidden(".opt.ok, .opt.no, .msg"), "testte doğru/yanlış gösterilmiyor");
+    await testCoz(p, ON_CEVAP.slice(0, 3)); await shot("test_soru");
+    await p.reload(); await p.waitForSelector("text=Devam et ➜");
+    ok(/4\. soru/.test(await p.textContent(".bubble")), "yenileyince kaldığı sorudan devam ediyor");
+    await p.click("text=Devam et ➜");
+    await testCoz(p, ON_CEVAP, 3);
+    await p.waitForSelector("text=Hazırsın!"); ok(!/\d+ \/ 12 doğru/.test(await p.textContent(".card")), "başlangıç testinin sonunda puan gösterilmiyor");
+    await p.click("text=Haritaya dön"); await p.waitForSelector('.node[data-durak="on"].bitti');
+    ok(await p.isVisible('.node[data-no="1"].acik') && await p.isVisible('.node[data-no="2"].kilitli'), "test bitince Dünya 1 açıldı, 2 kilitli");
+    await p.goto(URL + "#test-on"); await p.waitForSelector(".node"); ok(true, "bitmiş başlangıç testi yeniden çözülmüyor");
+    await p.click('.node[data-no="3"]'); ok(/önceki/.test(await p.textContent(".bubble")), "kilitli dünyaya dokununca Bit uyarıyor");
 
     const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu], [5, oynaListe], [6, oynaFonk], [7, oynaYz], [8, oynaRakam], [9, oynaPenguen], [10, (p, sh) => oynaRessam(p, sh, ad !== "masaustu")]];
     for (const [no, oyna] of oyunlar) {
@@ -316,6 +344,33 @@ async function oynaRessam(p, shot, fotograf) {
     }
     const yildiz = Number(await p.textContent(".m-top .score span"));
     ok(yildiz === 87, `toplam yıldız 87 (bulunan ${yildiz})`);
+
+    // bitiş testi → sonuçlar → sertifika
+    ok(await p.isVisible('.node[data-durak="son"].acik') && await p.isVisible('.node[data-durak="sertifika"].kilitli'), "10 dünya bitince bitiş testi açıldı");
+    await p.click('.node[data-durak="son"]'); await p.click("text=Başla ➜");
+    await testCoz(p, SON_CEVAP);
+    await p.waitForSelector(".r-table"); await shot("sonuc");
+    const barlar = await p.$$eval(".r-bar b", (b) => b.map((x) => x.textContent));
+    ok(barlar.join(",") === "5,12", `sonuç çubukları başta 5, sonda 12 (bulunan ${barlar})`);
+    ok((await p.$$(".r-row.yeni")).length === 7, "7 konu yeni öğrenildi olarak işaretli");
+    ok((await p.$$(".r-row:not(.r-head) .r-mark.r-idk")).length === 1, "Bilmiyorum cevabı ayrı işaretli");
+    ok(!(await tasma()), "sonuç ekranında yatay taşma yok");
+    await p.click("text=Sertifikanı al"); await p.waitForSelector("#c-ad");
+    await p.click(".t-form .btn"); ok(/unutma/.test(await p.textContent(".bubble")), "ad boşken sertifika hazırlanmıyor");
+    await p.fill("#c-ad", "Ayşe <b>Yılmaz</b>"); await p.click(".t-form .btn");
+    await p.waitForSelector(".cert");
+    ok((await p.textContent(".cert-name")) === "Ayşe <b>Yılmaz</b>", "sertifikadaki ad yazıldığı gibi (HTML olarak işlenmeden) görünüyor");
+    ok(/87 yıldız/.test(await p.textContent(".cert-text")), "sertifikada toplam yıldız var");
+    ok(!(await tasma()), "sertifikada yatay taşma yok"); await shot("sertifika");
+    if (ad === "masaustu") {
+      const pdf = await p.pdf({ landscape: true, format: "A4", printBackground: true, preferCSSPageSize: true });
+      const sayfa = (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;
+      ok(sayfa === 1, `yazdırma görünümü tek sayfa (bulunan ${sayfa})`);
+      fs.writeFileSync(`${OUT}/sertifika.pdf`, pdf);
+    }
+    ok(await p.evaluate(() => [...document.images].every((i) => i.complete && i.naturalWidth > 0)), "kırık resim yok");
+    await p.goto(URL + "#harita"); await p.waitForSelector('.node[data-durak="sertifika"].bitti');
+    ok(/sonra/.test(await p.textContent('.node[data-durak="son"]')) === false && await p.isVisible('.node[data-durak="son"].bitti'), "haritada bitiş testi bitti görünüyor");
     const uzun = [...new Set(kelime)].filter((t) => t.trim().split(/\s+/).length > 12);
     ok(uzun.length === 0, "Bit cümleleri en fazla 12 kelime" + (uzun.length ? ": " + uzun.join(" | ") : ""));
 
@@ -335,7 +390,7 @@ async function oynaRessam(p, shot, fotograf) {
     ok(/kapandı/.test(await p.textContent(".bubble")), "öğretmen modu kapatılabiliyor");
     await p.click("text=Bu cihazdaki ilerlemeyi sıfırla"); await p.click("text=Emin misin? Tekrar bas");
     await p.goto(URL + "#harita"); await p.waitForSelector(".node");
-    ok(await p.isVisible('.node[data-no="1"].acik'), "sıfırlama ilerlemeyi siliyor");
+    ok(await p.isVisible('.node[data-durak="on"].acik') && await p.isVisible('.node[data-no="1"].kilitli'), "sıfırlama ilerlemeyi ve testleri siliyor");
 
     // kilitli dünyaya doğrudan adresle girilemiyor
     await p.goto(URL + "#dunya-9"); await p.waitForSelector(".node");
