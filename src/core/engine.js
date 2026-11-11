@@ -6,6 +6,7 @@ import { el, $, wait, stars, STAR, confetti } from "./ui.js";
 import { say, bitSvg } from "./bit.js";
 import { sfx, soundButton } from "./sound.js";
 import { store } from "./store.js";
+import { gorselEtiketi } from "./gorseller.js";
 
 export function playWorld(world, root, { onExit }) {
   let at = 0, kazanilan = 0;
@@ -63,7 +64,8 @@ export function playWorld(world, root, { onExit }) {
   function finish() {
     store.completeWorld(world.id, kazanilan);
     dots.innerHTML = world.screens.map(() => '<span class="dot on"></span>').join("");
-    card.innerHTML = `<div class="end">${bitSvg("vay", "bit bit-xl")}
+    const kapak = gorselEtiketi("dunya-" + world.no, "end-cover");
+    card.innerHTML = `<div class="end">${kapak || bitSvg("vay", "bit bit-xl")}
       <h2>${world.title} bitti!</h2>
       <p class="end-stars">${stars(Math.min(kazanilan, 10))} <b>${kazanilan} yıldız</b></p>
       <ul>${(world.ozet || []).map((s) => `<li>${s}</li>`).join("")}</ul>

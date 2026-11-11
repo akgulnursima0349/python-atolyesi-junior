@@ -36,6 +36,10 @@ export function ogretmen(root) {
       row.append(git, kapat);
       card.append(row);
     }
+    if (store.testBitti("son")) {
+      const r = el("a", "btn sec", "📊 Bu cihazdaki test sonuçları"); r.href = "#sonuc";
+      const sat = el("div", "actions"); sat.append(r); card.append(sat);
+    }
     /* paylaşılan bilgisayarlar için: ilerlemeyi sıfırla (iki adımlı onay) */
     const sifirla = el("div", "danger");
     const b = el("button", "btn sec", "Bu cihazdaki ilerlemeyi sıfırla");
