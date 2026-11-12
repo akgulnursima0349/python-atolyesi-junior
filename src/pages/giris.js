@@ -13,21 +13,20 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 
 export function girisSayfasi(root) {
   root.innerHTML = "";
-  /* iki sütun: solda kurum ve kurs kimliği, sağda form (telefonda üst üste) */
-  const sahne = el("div", "giris-sahne");
-  const logo = gorsel("logo"), resim = gorsel("giris") || gorsel("oyun-bot");
-  const marka = el("section", "giris-marka");
-  marka.innerHTML = `${logo ? `<img class="g-logo" src="${logo}" alt="Sivas Robotik Akademi">` : ""}
-    <h1>Python Atölyesi <span>Junior</span></h1>
-    <p>4–6. sınıflar için adım adım Python ve yapay zekâ.</p>
-    ${resim ? `<img class="g-resim" src="${resim}" alt="" decoding="async">` : ""}`;
+  /* ortalanmış tek sütun: üstte logo ve başlık, altında üst kenarı görselli tek kart */
+  const logo = gorsel("logo"), bant = gorsel("giris") || gorsel("dunya-2");
   const ses = el("div", "giris-ses"); ses.append(soundButton());
-  marka.append(ses);
-  const sag = el("div", "giris-sag");
-  const card = el("main", "card giris");
-  sag.append(card);
-  sahne.append(marka, sag);
-  root.append(sahne);
+  const orta = el("div", "giris-orta");
+  const ust = el("header", "giris-ust");
+  ust.innerHTML = `${logo ? `<img class="g-logo" src="${logo}" alt="Sivas Robotik Akademi">` : ""}
+    <h1>Python Atölyesi <span>Junior</span></h1>
+    <p>4–6. sınıflar için adım adım Python ve yapay zekâ</p>`;
+  const kutu = el("div", "giris-kutu");
+  if (bant) kutu.innerHTML = `<img class="g-bant" src="${bant}" alt="" decoding="async">`;
+  const card = el("main", "giris");
+  kutu.append(card);
+  orta.append(ust, kutu);
+  root.append(ses, orta);
 
   const bas = (metin, mood = "mutlu") => { card.innerHTML = ""; card.append(say(metin, mood)); };
   const mesaj = (m, tur = "bad") => { let d = $(".msg", card); if (!d) { d = el("div", "msg"); card.append(d); } d.className = "msg " + tur; d.innerHTML = m; d.setAttribute("role", "alert"); };
@@ -53,7 +52,7 @@ export function girisSayfasi(root) {
       <div class="actions"><button class="btn" type="submit">Giriş yap ➜</button><button class="btn sec" type="button" id="g-geri">Geri</button></div>`;
     card.append(f);
     $("#g-geri", f).onclick = secim;
-    setTimeout(() => $(oku() ? "#g-ad" : "#g-kod", f).focus(), 50);
+    $(oku() ? "#g-ad" : "#g-kod", f).focus({ preventScroll: true });
     f.onsubmit = async (e) => {
       e.preventDefault();
       const kod = $("#g-kod", f).value.trim().toUpperCase(), ad = $("#g-ad", f).value.trim(), pin = $("#g-pin", f).value.trim();
@@ -80,7 +79,7 @@ export function girisSayfasi(root) {
     if (not) mesaj(not, "ok");
     $("#g-geri", f).onclick = secim;
     $("#g-kayit", f).onclick = kaydol;
-    setTimeout(() => $("#g-eposta", f).focus(), 50);
+    $("#g-eposta", f).focus({ preventScroll: true });
     f.onsubmit = async (e) => {
       e.preventDefault();
       mesgul(f, true, "Giriş yapılıyor…");
