@@ -965,26 +965,22 @@ body { background: var(--bg) }
 .giris-kart.sec .gk-ik { color: var(--robot-2) }
 .giris-kart { border-width: 2px }
 
-/* giriş: solda kimlik, sağda form */
-.giris-sahne { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; min-height: calc(100vh - 48px); min-height: calc(100dvh - 48px); width: 100%; max-width: 1000px; margin: 0 auto }
-.giris-marka { position: relative; background: var(--robot); color: #fff; border-radius: 22px; padding: 30px 30px 30px; display: flex; flex-direction: column; gap: 12px; overflow: hidden }
-.giris-marka h1 { margin: 6px 0 0; font-size: clamp(28px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -.01em }
-.giris-marka h1 span { color: var(--hl) }
-.giris-marka p { margin: 0; font-size: 18px; opacity: .92; max-width: 34ch }
-.g-logo { align-self: flex-start; max-height: 64px; max-width: 240px; object-fit: contain; background: #fff; padding: 10px 14px; border-radius: 14px }
-.g-resim { margin-top: auto; width: 100%; max-height: 360px; aspect-ratio: 1; object-fit: cover; border-radius: 18px }
-.giris-sag { display: flex; flex-direction: column; gap: 10px; justify-content: center; min-width: 0 }
-.giris-ses { position: absolute; top: 16px; right: 16px }
-.giris-ses .icon-btn { border: 0; background: rgba(255, 255, 255, .18); color: #fff }
-.giris-marka h1 { padding-right: 52px }
-.giris-sag .card { width: 100% }
-@media (max-width: 760px) {
-  .giris-sahne { grid-template-columns: 1fr; min-height: 0; gap: 12px }
-  .giris-marka { padding: 20px; gap: 8px }
-  .giris-marka p { font-size: 16px }
-  .g-resim { display: none }
-  .g-logo { max-height: 48px }
-  .giris-ses { top: 12px; right: 12px }
+/* giriş: ortalanmış tek sütun */
+.giris-ses { position: fixed; top: 14px; right: max(16px, env(safe-area-inset-right, 0px)); z-index: 5 }
+.giris-orta { width: 100%; max-width: 560px; margin: 8px auto 0; display: flex; flex-direction: column; gap: 18px }
+.giris-ust { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px }
+.giris-ust h1 { margin: 4px 0 0; font-size: clamp(28px, 5vw, 36px); line-height: 1.1; letter-spacing: -.01em; color: var(--ink) }
+.giris-ust h1 span { color: var(--accent) }
+.giris-ust p { margin: 0; color: var(--ink-2); font-size: 17px }
+.g-logo { width: 84px; height: 84px; border-radius: 50%; box-shadow: 0 0 0 1px var(--line), 0 6px 18px rgba(23, 32, 54, .08) }
+.giris-kutu { background: var(--card); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--golge); overflow: hidden }
+.g-bant { display: block; width: 100%; height: 170px; object-fit: cover; object-position: center 40% }
+.giris { padding: 20px; display: flex; flex-direction: column; gap: 16px }
+@media (max-width: 520px) {
+  .g-logo { width: 68px; height: 68px }
+  .g-bant { height: 120px }
+  .giris { padding: 16px }
+  .giris-orta { margin-top: 0 }
 }
 
 /* akademi kimliği: logo ve kırmızı-siyah */
@@ -993,13 +989,20 @@ body { background: var(--bg) }
 .brand em { font-style: normal; color: var(--accent) }
 .b-logo { width: 40px; height: 40px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px var(--line) }
 @media (max-width: 520px) { .b-logo { width: 34px; height: 34px } .brand.marka { font-size: 18px } }
-.giris-marka { background: #18191f }
-.giris-marka h1 span { color: #ff6b70 }
-.g-logo { background: none; padding: 0; width: 88px; height: 88px; max-height: none; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255, 255, 255, .12) }
-@media (max-width: 760px) { .g-logo { width: 64px; height: 64px } }
 .cert-logo { width: 72px; height: 72px; border-radius: 50%; flex: none }
 @media (min-width: 700px), print {
   .cert.resimli .cert-top { gap: 1.4cqw; text-align: left }
   .cert.resimli .cert-logo { width: 5.4cqw; height: 5.4cqw }
 }
 .cert-top:has(.cert-logo) .cert-bit { display: none }
+/* girişte Bit zaten üstteki görselde: kartta yalnızca balon kalır */
+.giris .say .bit { display: none }
+.giris .say .bubble { width: 100%; text-align: center }
+.giris .say .bubble::before { display: none }
+@media (max-width: 520px) {
+  .giris-sec { grid-template-columns: 1fr 1fr; gap: 10px }
+  .giris-kart { padding: 16px 8px }
+  .giris-kart b { font-size: 18px }
+  .giris-kart small { font-size: 13px }
+  .giris-kart .gk-ik { width: 36px; height: 36px }
+}

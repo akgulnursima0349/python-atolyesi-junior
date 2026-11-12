@@ -29,7 +29,7 @@ export function sertifikaSayfasi(root) {
       store.setAd(v); sfx.dogru(); confetti(); goster();
     };
     card.append(form);
-    setTimeout(() => { const i = $("#c-ad", card); if (i) i.focus(); }, 50);
+    $("#c-ad", card).focus({ preventScroll: true });
   }
 
   function goster() {
