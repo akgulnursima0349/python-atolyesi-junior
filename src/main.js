@@ -6,6 +6,11 @@ import { bul, durum, durakDurumu } from "./worlds/index.js";
 import { testSayfasi } from "./pages/test.js";
 import { sonucSayfasi } from "./pages/sonuc.js";
 import { sertifikaSayfasi } from "./pages/sertifika.js";
+import { salonSayfasi, oyunSayfasi } from "./pages/salon.js";
+import { oyunBul, oyunAcik, dunyaOyunu } from "./salon/index.js";
+
+/* dünya bitince açılan oyunu bitiş ekranında haber ver */
+const yeniOyun = (w) => { const o = dunyaOyunu(w.id); return o ? `<a class="yeni-oyun" href="#oyun-${o.id}"><span>${o.ikon}</span><span><small>Oyun Salonu'nda açıldı</small><b>${o.ad}</b></span></a>` : ""; };
 
 const root = document.getElementById("app");
 
@@ -16,7 +21,7 @@ function route() {
     const w = bul(m[1]);
     if (w && (durum(w) === "acik" || durum(w) === "bitti")) {
       document.title = `${w.title} · Python Atölyesi Junior`;
-      return playWorld(w, root, {});
+      return playWorld(w, root, { sonEk: yeniOyun });
     }
     return (location.hash = "harita");
   }
@@ -30,6 +35,14 @@ function route() {
     return testSayfasi(root, tm[1]);
   }
   if (h === "sonuc") return sonucSayfasi(root);
+  if (h === "salon") { document.title = "Oyun Salonu · Python Atölyesi Junior"; return salonSayfasi(root); }
+  const om = h.match(/^oyun-(\w+)$/);
+  if (om) {
+    const o = oyunBul(om[1]);
+    if (!o || !oyunAcik(o)) return (location.hash = "salon");
+    document.title = `${o.ad} · Python Atölyesi Junior`;
+    return oyunSayfasi(root, o);
+  }
   if (h === "sertifika") {
     if (durakDurumu("sertifika") === "kilitli") return (location.hash = "harita");
     document.title = "Sertifika · Python Atölyesi Junior";

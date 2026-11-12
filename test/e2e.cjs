@@ -62,6 +62,44 @@ async function oynaDongu(p, shot) {
   await p.waitForSelector(".end"); await shot("son");
 }
 
+/* Oyun Salonu: her oyundan bir tur. Seçenekli ekranlarda sırayla dener (yanlışlar yalnızca yıldızı düşürür). */
+async function denemeyle(p, sel) {
+  const b = await p.$$(sel);
+  for (const x of b) {
+    if (await p.isVisible(".next:not([hidden])")) break;
+    if (await x.isDisabled()) continue;
+    await x.click(); await p.waitForTimeout(200);
+    if (await x.evaluate((e) => !e.classList.contains("no") && !e.classList.contains("nope"))) break;
+  }
+  await bekleDevam(p, 15000);
+}
+async function oynaOyun(p, id) {
+  await p.goto(URL + "#oyun-" + id); await p.waitForSelector(".card .say");
+  for (let ekran = 0; ekran < 8 && !(await p.isVisible(".end")); ekran++) {
+    if (id === "yapboz") {
+      const n = (await p.$$(".havuz .kart")).length;
+      for (let i = 0; i < n; i++) await p.click(`.havuz .kart[data-i="${i}"]`);
+      await p.click("button:has-text('Çalıştır')");
+    } else if (id === "hata") await denemeyle(p, ".bugline");
+    else if (id === "piksel") {
+      const cevap = JSON.parse(await p.getAttribute(".piksel", "data-cevap"));
+      const sec = await p.$$(".px-ctrl .num-btn");
+      for (let i = 0; i < cevap.length; i++) {
+        const simdi = Number(await (await sec[i].$("output")).textContent());
+        const d = cevap[i] - simdi, btn = (await sec[i].$$("button"))[d > 0 ? 1 : 0];
+        for (let k = 0; k < Math.abs(d); k++) await btn.click();
+      }
+      await p.click("button:has-text('Boya')");
+    } else if (id === "ajan") {
+      const n = (await p.$$(".aj-wagon")).length;
+      for (const c of await p.$$eval(".aj-slot code", (x) => x.map((e) => Number(e.textContent.match(/-?\d+/)[0])))) await p.click(`.aj-wagon[data-i="${c < 0 ? n + c : c}"]`);
+    } else await denemeyle(p, ".opts .opt");
+    await devam(p);
+  }
+  await p.waitForSelector(".end");
+  return p.textContent(".end");
+}
+
 /* testte cevapları sırayla seç: sayı = seçenek sırası, -1 = Bilmiyorum */
 async function testCoz(p, cevaplar, bas = 0) {
   for (let i = bas; i < cevaplar.length; i++) {
@@ -313,6 +351,9 @@ async function oynaRessam(p, shot, fotograf) {
     ok(await p.isVisible('.node[data-durak="on"].acik') && durumlar.every((d) => d === "kilitli"), "başta yalnızca başlangıç testi açık, Dünya 1 kilitli");
     ok(await p.isVisible('.node[data-durak="son"].kilitli') && await p.isVisible('.node[data-durak="sertifika"].kilitli'), "bitiş testi ve sertifika kilitli");
     ok(!(await tasma()), "haritada yatay taşma yok");
+    ok(await p.isHidden(".salon-btn"), "Oyun Salonu düğmesi hiçbir dünya bitmeden görünmüyor");
+    await p.goto(URL + "#oyun-yapboz"); await p.waitForSelector(".oyun-kart"); ok(true, "kilitli oyunun adresi salona döndürüyor");
+    await p.goto(URL + "#harita"); await p.waitForSelector(".node");
     await p.click('.node[data-no="1"]'); ok(/başlangıç testini/.test(await p.textContent(".bubble")), "test çözülmeden Dünya 1'e dokununca Bit uyarıyor");
     await p.goto(URL + "#test-son"); await p.waitForSelector(".node"); ok(true, "kilitli bitiş testinin adresi haritaya döndürüyor");
     ok(durumlar.every((d) => d !== "hazirlaniyor"), "hazırlanıyor durumunda dünya kalmadı");
@@ -337,6 +378,7 @@ async function oynaRessam(p, shot, fotograf) {
       ok(!(await tasma()), `Dünya ${no} ekranında yatay taşma yok`);
       await oyna(p, shot);
       ok(!(await tasma()), `Dünya ${no} sonunda yatay taşma yok`);
+      if (no <= 7) ok(await p.isVisible(".end .yeni-oyun"), `Dünya ${no} bitince yeni oyun haberi çıkıyor`);
       await p.click("text=Haritaya dön");
       await p.waitForSelector(`.node[data-no="${no}"].bitti`);
       if (no === 1) ok(await p.evaluate(() => !window.Sk), "Python (Skulpt) ilk Yaz ekranına kadar yüklenmedi");
@@ -344,6 +386,24 @@ async function oynaRessam(p, shot, fotograf) {
     }
     const yildiz = Number(await p.textContent(".m-top .score span"));
     ok(yildiz === 87, `toplam yıldız 87 (bulunan ${yildiz})`);
+
+    // Oyun Salonu: 7 oyun açık, her birinden bir tur
+    await p.click(".salon-btn"); await p.waitForSelector(".oyun-kart");
+    ok((await p.$$(".oyun-kart:not(.kilitli)")).length === 7, "10 dünya bitince Oyun Salonu'nda 7 oyun açık");
+    await shot("salon");
+    for (const id of ["yapboz", "tahmin", "hata", "piksel", "ajan", "bot", "model"]) {
+      const son = await oynaOyun(p, id);
+      ok(/\d \/ [345] yıldız/.test(son), `${id} oyununda bir tur oynandı (${son.match(/\d \/ \d/)})`);
+      ok(!(await tasma()), `${id} oyununda yatay taşma yok`);
+      if (id === "piksel") await shot("oyun_piksel_son");
+    }
+    await p.click("text=Bir tur daha"); await p.waitForSelector(".card .say");
+    ok(await p.isVisible(".code .ln") && !(await p.isVisible(".end")), "Bir tur daha yeni bir tur başlatıyor");
+    await p.goto(URL + "#salon"); await p.waitForSelector(".oyun-kart");
+    ok(/En iyi/.test(await p.textContent('.oyun-kart[data-oyun="model"]')), "salonda en iyi tur yıldızı görünüyor");
+    ok(Number(await p.evaluate(() => JSON.parse(localStorage.getItem("atolye-junior-v1")).oyunlar.model.tur)) === 1, "biten tur kaydediliyor");
+    await p.goto(URL + "#harita"); await p.waitForSelector(".node");
+    ok(Number(await p.textContent(".m-top .score span")) === 87, "oyun yıldızları dünya yıldızlarına karışmıyor");
 
     // bitiş testi → sonuçlar → sertifika
     ok(await p.isVisible('.node[data-durak="son"].acik') && await p.isVisible('.node[data-durak="sertifika"].kilitli'), "10 dünya bitince bitiş testi açıldı");

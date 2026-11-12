@@ -1,6 +1,6 @@
 /* İlerleme kaydı: tek anahtar, cihazda. Depolama yoksa bellekte tutar, site yine çalışır. */
 const KEY = "atolye-junior-v1";
-const VARSAYILAN = { worlds: {}, sound: true, teacher: false, testler: {}, ad: "" };
+const VARSAYILAN = { worlds: {}, sound: true, teacher: false, testler: {}, ad: "", oyunlar: {} };
 let state = load();
 
 function load() {
@@ -32,6 +32,14 @@ export const store = {
   testKaydet(tur, cevaplar, bitti) {
     state.testler = state.testler || {};
     state.testler[tur] = { cevaplar: [...cevaplar], bitti: !!bitti, tarih: new Date().toISOString() };
+    save();
+  },
+  /* oyunlar: { id: { en: en iyi tur yıldızı, tur: oynanan tur sayısı } } */
+  oyun: (id) => (state.oyunlar || {})[id] || { en: 0, tur: 0 },
+  oyunKaydet(id, yildiz) {
+    state.oyunlar = state.oyunlar || {};
+    const o = state.oyunlar[id] || { en: 0, tur: 0 };
+    state.oyunlar[id] = { en: Math.max(o.en, yildiz), tur: o.tur + 1 };
     save();
   },
   ad: () => state.ad || "",
