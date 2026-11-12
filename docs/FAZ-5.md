@@ -45,9 +45,9 @@ Bitiş testinden sonra: "Başta 5 · Sonda 11" iki büyük çubuk, altında 12 k
 - Önceki fazların kuralları geçerli.
 
 ## Bitti tanımı
-- [ ] Haritada başlangıç testi, bitiş testi ve sertifika düğümleri var; sıra kuralı çalışıyor.
-- [ ] İki test 12'şer soru, her kazanımdan bir; cevaplar yenilemeden sonra da duruyor.
-- [ ] Sonuç ekranı önce/sonra karşılaştırmasını doğru sayıyor (otomatik testte bilinen cevaplarla).
-- [ ] Sertifika adla oluşuyor, yazdırma görünümü tek sayfa.
-- [ ] Görsel dosyası yokken hiçbir yerde kırık resim yok.
-- [ ] Bütün kurs (test + 10 dünya + test + sertifika) üç ekran boyutunda otomatik testte oynanıyor.
+- [x] Haritada başlangıç testi, bitiş testi ve sertifika düğümleri var; sıra kuralı çalışıyor.
+- [x] İki test 12'şer soru, her kazanımdan bir; cevaplar yenilemeden sonra da duruyor.
+- [x] Sonuç ekranı önce/sonra karşılaştırmasını doğru sayıyor (otomatik testte bilinen cevaplarla).
+- [x] Sertifika adla oluşuyor, yazdırma görünümü tek sayfa.
+- [x] Görsel dosyası yokken hiçbir yerde kırık resim yok.
+- [x] Bütün kurs (test + 10 dünya + test + sertifika) üç ekran boyutunda otomatik testte oynanıyor.
