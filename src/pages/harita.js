@@ -5,6 +5,8 @@ import { soundButton, sfx } from "../core/sound.js";
 import { store } from "../core/store.js";
 import { WORLDS, durum, durakDurumu } from "../worlds/index.js";
 import { salonAcik } from "../salon/index.js";
+import { hesapParcasi } from "../core/hesap.js";
+import { bulut } from "../cloud/bulut.js";
 
 const KILIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>';
 const X_DIZISI = [0.18, 0.5, 0.82, 0.5]; // yolun kıvrımı: sol, orta, sağ, orta…
@@ -13,9 +15,11 @@ export function harita(root) {
   root.innerHTML = "";
   const top = el("header", "m-top home");
   top.innerHTML = `<div class="brand">Python Atölyesi <span>Junior</span></div>
-    ${store.teacher() ? '<a class="teacher-tag" href="#ogretmen">Öğretmen modu</a>' : ""}
+    ${store.teacher() && bulut.mod !== "bulut" ? '<a class="teacher-tag" href="#ogretmen">Öğretmen modu</a>' : ""}
     ${salonAcik() ? '<a class="salon-btn" href="#salon"><span aria-hidden="true">🎮</span><span class="sb-t">Oyun Salonu</span></a>' : ""}
     <div class="score">${STAR}<span>${store.totalStars()}</span></div>`;
+  const hesap = hesapParcasi();
+  if (hesap) top.append(hesap);
   top.append(soundButton());
 
   /* yol: başlangıç testi → 10 dünya → bitiş testi → sertifika */
@@ -87,7 +91,7 @@ export function harita(root) {
     map.append(row);
   });
 
-  const foot = el("footer", "m-foot", '<a href="#ogretmen">Öğretmen</a>');
+  const foot = el("footer", "m-foot", bulut.mod === "bulut" ? "" : '<a href="#ogretmen">Öğretmen</a>');
   root.append(top, hello, map, foot);
 
   /* nodları birleştiren kesikli yol */

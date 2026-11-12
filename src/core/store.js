@@ -10,7 +10,10 @@ function load() {
   } catch (_) { /* depolama kapalı ya da bozuk */ }
   return JSON.parse(JSON.stringify(VARSAYILAN));
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} }
+let degisti = null; /* bulut katmanı buraya bağlanır: her kayıttan sonra çağrılır */
+function save(eslenecek = true) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} if (eslenecek && degisti) degisti(); }
+/* buluta giden kısım: ses ve öğretmen bayrağı cihazda kalır */
+const ESLENEN = ["worlds", "testler", "ad", "oyunlar"];
 
 export const store = {
   get: () => state,
@@ -23,9 +26,18 @@ export const store = {
   },
   totalStars: () => Object.values(state.worlds).reduce((t, w) => t + (w.stars || 0), 0),
   sound: () => state.sound,
-  setSound(v) { state.sound = !!v; save(); },
+  setSound(v) { state.sound = !!v; save(false); },
   teacher: () => state.teacher,
-  setTeacher(v) { state.teacher = !!v; save(); },
+  setTeacher(v) { state.teacher = !!v; save(false); },
+  onDegisim(f) { degisti = f; },
+  veri: () => Object.fromEntries(ESLENEN.map((k) => [k, JSON.parse(JSON.stringify(state[k] ?? VARSAYILAN[k]))])),
+  /* buluttan gelen kaydı cihazdakinin yerine koy (ses tercihi korunur) */
+  yukle(v) {
+    const t = state.teacher, ses = state.sound;
+    state = { ...JSON.parse(JSON.stringify(VARSAYILAN)), sound: ses, teacher: t };
+    ESLENEN.forEach((k) => { if (v && v[k] != null) state[k] = v[k]; });
+    save(false);
+  },
   /* testler: { on|son: { cevaplar: [..], bitti, tarih } } */
   test: (tur) => (state.testler || {})[tur] || null,
   testBitti: (tur) => !!(state.testler && state.testler[tur] && state.testler[tur].bitti),
