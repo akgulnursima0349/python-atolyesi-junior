@@ -3,7 +3,7 @@
 :root {
   color-scheme: light;
   --bg: #eaf4fd; --bg-2: #f6fbff; --card: #ffffff; --ink: #1b2440; --ink-2: #5c6987; --line: #d6e3f2;
-  --accent: #ff6b3d; --accent-2: #d9542b; --robot: #22a6a0; --robot-2: #188a85;
+  --accent: #d7262e; --accent-2: #a8141b; --robot: #22a6a0; --robot-2: #188a85;
   --hl: #ffd84d; --hl-soft: #fff4c7; --ok: #2f9e5a; --bad: #e0464b; --path: #b8cde6; --track: #dbe6f3;
   --code-bg: #1b2440; --code-fg: #eef2ff; --code-dim: #94a2c4; --code-row: #26325a;
   --f-disp: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -986,3 +986,20 @@ body { background: var(--bg) }
   .g-logo { max-height: 48px }
   .giris-ses { top: 12px; right: 12px }
 }
+
+/* akademi kimliği: logo ve kırmızı-siyah */
+.brand.marka { display: inline-flex; align-items: center; gap: 10px }
+.brand .b-ad { color: var(--ink) }
+.brand em { font-style: normal; color: var(--accent) }
+.b-logo { width: 40px; height: 40px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px var(--line) }
+@media (max-width: 520px) { .b-logo { width: 34px; height: 34px } .brand.marka { font-size: 18px } }
+.giris-marka { background: #18191f }
+.giris-marka h1 span { color: #ff6b70 }
+.g-logo { background: none; padding: 0; width: 88px; height: 88px; max-height: none; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255, 255, 255, .12) }
+@media (max-width: 760px) { .g-logo { width: 64px; height: 64px } }
+.cert-logo { width: 72px; height: 72px; border-radius: 50%; flex: none }
+@media (min-width: 700px), print {
+  .cert.resimli .cert-top { gap: 1.4cqw; text-align: left }
+  .cert.resimli .cert-logo { width: 5.4cqw; height: 5.4cqw }
+}
+.cert-top:has(.cert-logo) .cert-bit { display: none }

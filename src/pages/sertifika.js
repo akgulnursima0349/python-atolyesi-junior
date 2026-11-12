@@ -4,7 +4,7 @@ import { say, bitSvg } from "../core/bit.js";
 import { sfx, soundButton } from "../core/sound.js";
 import { store } from "../core/store.js";
 import { WORLDS } from "../worlds/index.js";
-import { gorselEtiketi } from "../core/gorseller.js";
+import { gorsel, gorselEtiketi } from "../core/gorseller.js";
 import { ikon } from "../core/ikon.js";
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -45,7 +45,7 @@ export function sertifikaSayfasi(root) {
     cert.innerHTML = `
       ${resim}
       <div class="cert-in">
-        <div class="cert-top">${bitSvg("vay", "bit cert-bit")}<div><p class="cert-kicker">Başarı Sertifikası</p><p class="cert-course">Python Atölyesi <span>Junior</span></p></div></div>
+        <div class="cert-top">${bitSvg("vay", "bit cert-bit")}${gorsel("logo") ? `<img class="cert-logo" src="${gorsel("logo")}" alt="">` : ""}<div><p class="cert-kicker">Sivas Robotik Akademi · Başarı Sertifikası</p><p class="cert-course">Python Atölyesi <span>Junior</span></p></div></div>
         <p class="cert-small">Bu sertifika</p>
         <h2 class="cert-name">${esc(store.ad())}</h2>
         <p class="cert-text">adlı öğrencinin <b>10 dünyanın hepsini</b> bitirip <b>${store.totalStars()} yıldız</b> topladığını gösterir.</p>

@@ -7,6 +7,7 @@ import { WORLDS, durum, durakDurumu } from "../worlds/index.js";
 import { salonAcik } from "../salon/index.js";
 import { hesapParcasi } from "../core/hesap.js";
 import { ikon } from "../core/ikon.js";
+import { gorsel } from "../core/gorseller.js";
 import { bulut } from "../cloud/bulut.js";
 
 const KILIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>';
@@ -15,7 +16,7 @@ const X_DIZISI = [0.18, 0.5, 0.82, 0.5]; // yolun kıvrımı: sol, orta, sağ, o
 export function harita(root) {
   root.innerHTML = "";
   const top = el("header", "m-top home");
-  top.innerHTML = `<div class="brand">Python Atölyesi <span>Junior</span></div>
+  top.innerHTML = `<div class="brand marka">${gorsel("logo") ? `<img class="b-logo" src="${gorsel("logo")}" alt="Sivas Robotik Akademi">` : ""}<span class="b-ad">Python Atölyesi <em>Junior</em></span></div>
     ${store.teacher() && bulut.mod !== "bulut" ? '<a class="teacher-tag" href="#ogretmen">Öğretmen modu</a>' : ""}
     ${salonAcik() ? `<a class="salon-btn" href="#salon">${ikon("oyun")}<span class="sb-t">Oyun Salonu</span></a>` : ""}
     <div class="score">${STAR}<span>${store.totalStars()}</span></div>`;
@@ -27,7 +28,7 @@ export function harita(root) {
   const DURAK = {
     on: { title: "Başlangıç testi", icon: "test", color: "#ffd84d", hash: "test-on" },
     son: { title: "Bitiş testi", icon: "bayrak", color: "#ffd84d", hash: "test-son" },
-    sertifika: { title: "Sertifika", icon: "odul", color: "#ff6b3d", hash: "sertifika" }
+    sertifika: { title: "Sertifika", icon: "odul", color: "#ff8a8f", hash: "sertifika" }
   };
   const yol = [{ durak: "on" }, ...WORLDS.map((w) => ({ w })), { durak: "son" }, { durak: "sertifika" }];
 
