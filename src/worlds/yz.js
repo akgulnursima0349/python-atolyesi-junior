@@ -212,7 +212,7 @@ function yaz(ctx) {
 }
 
 export const yz = {
-  id: "yz", no: 7, title: "Yapay Zekânın Alet Çantası", icon: "🧰", color: "#ffd84d",
+  id: "yz", no: 7, title: "Yapay Zekânın Alet Çantası", icon: "beyin", color: "#ffd84d",
   screens: [ornek, tablo, cizim, yeniMeyve, model, sirala, yaz],
   ozet: ["Yapay zekâ örneklerden öğrenir", 'df["agirlik"] → tablodan sütun (Pandas)', "plt.scatter → nokta grafiği (Matplotlib)", "model.fit → eğit, model.predict → sor"]
 };

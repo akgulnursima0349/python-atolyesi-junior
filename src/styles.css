@@ -923,3 +923,66 @@ label.btn input[hidden] { display: none }
   .pin-kart code { font: 700 14pt var(--f-code); letter-spacing: .1em }
   body.pin-yazdir { background: #fff }
 }
+
+/* =====================================================================
+   Tasarım düzeni (yayın öncesi): düz zemin, ince çerçeveli kartlar, tek tip çizgi ikonlar.
+   Renkler akademinin logosuna göre --accent / --robot üzerinden ayarlanır.
+   ===================================================================== */
+:root { --bg: #f2f6fa; --bg-2: #f2f6fa; --line: #dce4ee; --r: 14px;
+  --golge: 0 1px 2px rgba(23, 32, 54, .06), 0 6px 18px rgba(23, 32, 54, .05) }
+body { background: var(--bg) }
+.card, .map-hello { border-radius: 20px; border: 1px solid var(--line); box-shadow: var(--golge) }
+.back, .score, .icon-btn, .hesap { box-shadow: none; border: 1px solid var(--line) }
+.btn { border-radius: 12px; box-shadow: 0 2px 0 var(--accent-2) }
+.btn:active { transform: translateY(1px); box-shadow: none }
+.btn.sec { box-shadow: none; border: 1.5px solid var(--line) }
+.btn.sec:hover:not(:disabled) { border-color: var(--ink-2) }
+.btn.small { box-shadow: none }
+.stage { border-radius: var(--r) }
+.bubble { border-radius: 14px }
+
+/* çizgi ikonlar */
+.ik { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; stroke-width: 2 }
+.btn .ik { width: 20px; height: 20px }
+.orb .ico { color: var(--ink); line-height: 0 }
+.orb .ico .ik { width: 40px; height: 40px; stroke-width: 2.1 }
+.node.kilitli .orb .ico { color: #fff }
+.node.durak .ico .ik { width: 34px; height: 34px }
+@media (max-width: 520px) { .orb .ico .ik { width: 32px; height: 32px } .node.durak .ico .ik { width: 28px; height: 28px } }
+.salon-btn { background: var(--card); color: var(--ink); border: 1px solid var(--line); box-shadow: none; gap: 8px }
+.salon-btn .ik { width: 20px; height: 20px; color: var(--accent) }
+.oyun-ikon .ik { width: 56px; height: 56px; color: var(--ink) }
+.yo-ik { line-height: 0 }
+.yo-ik .ik { width: 30px; height: 30px; color: var(--accent-2) }
+.cert-worlds span .ik { width: 55%; height: 55%; color: var(--ink) }
+.r-row i .ik { width: 20px; height: 20px; color: var(--robot-2) }
+.t-rules span { display: inline-flex; align-items: center; gap: 10px }
+.t-rules .ik { width: 20px; height: 20px; color: var(--robot-2) }
+.hesap-ikon { line-height: 0 }
+.hesap-ikon .ik, .hesap-cik .ik, .hesap-panel .ik { width: 16px; height: 16px }
+.hesap-cik, .hesap-panel { display: inline-flex; align-items: center; gap: 6px }
+.giris-kart .gk-ik { width: 44px; height: 44px; color: var(--accent) }
+.giris-kart.sec .gk-ik { color: var(--robot-2) }
+.giris-kart { border-width: 2px }
+
+/* giriş: solda kimlik, sağda form */
+.giris-sahne { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; min-height: calc(100vh - 48px); min-height: calc(100dvh - 48px); width: 100%; max-width: 1000px; margin: 0 auto }
+.giris-marka { position: relative; background: var(--robot); color: #fff; border-radius: 22px; padding: 30px 30px 30px; display: flex; flex-direction: column; gap: 12px; overflow: hidden }
+.giris-marka h1 { margin: 6px 0 0; font-size: clamp(28px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -.01em }
+.giris-marka h1 span { color: var(--hl) }
+.giris-marka p { margin: 0; font-size: 18px; opacity: .92; max-width: 34ch }
+.g-logo { align-self: flex-start; max-height: 64px; max-width: 240px; object-fit: contain; background: #fff; padding: 10px 14px; border-radius: 14px }
+.g-resim { margin-top: auto; width: 100%; max-height: 360px; aspect-ratio: 1; object-fit: cover; border-radius: 18px }
+.giris-sag { display: flex; flex-direction: column; gap: 10px; justify-content: center; min-width: 0 }
+.giris-ses { position: absolute; top: 16px; right: 16px }
+.giris-ses .icon-btn { border: 0; background: rgba(255, 255, 255, .18); color: #fff }
+.giris-marka h1 { padding-right: 52px }
+.giris-sag .card { width: 100% }
+@media (max-width: 760px) {
+  .giris-sahne { grid-template-columns: 1fr; min-height: 0; gap: 12px }
+  .giris-marka { padding: 20px; gap: 8px }
+  .giris-marka p { font-size: 16px }
+  .g-resim { display: none }
+  .g-logo { max-height: 48px }
+  .giris-ses { top: 12px; right: 12px }
+}

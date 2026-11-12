@@ -5,6 +5,7 @@ import { sfx, soundButton } from "../core/sound.js";
 import { store } from "../core/store.js";
 import { playWorld } from "../core/engine.js";
 import { gorselEtiketi } from "../core/gorseller.js";
+import { ikon } from "../core/ikon.js";
 import { OYUNLAR, oyunAcik, oyunDunyasi } from "../salon/index.js";
 
 const KILIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>';
@@ -24,7 +25,7 @@ export function salonSayfasi(root) {
     kart.style.setProperty("--c", o.renk);
     kart.dataset.oyun = o.id;
     const resim = gorselEtiketi("oyun-" + o.id, "oyun-resim");
-    kart.innerHTML = `<span class="oyun-ust">${resim || `<span class="oyun-ikon">${acik ? o.ikon : KILIT}</span>`}</span>
+    kart.innerHTML = `<span class="oyun-ust">${resim || `<span class="oyun-ikon">${acik ? ikon(o.ikon) : KILIT}</span>`}</span>
       <span class="oyun-ad">${o.ad}</span>
       <span class="oyun-alt">${acik ? (kayit.tur ? `En iyi: ${stars(kayit.en)}${kayit.en ? "" : "–"}` : "Yeni!") : `Dünya ${w.no} bitince açılır`}</span>`;
     if (acik) kart.href = "#oyun-" + o.id;

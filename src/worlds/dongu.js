@@ -332,7 +332,7 @@ function gorev(ctx) {
 }
 
 export const dongu = {
-  id: "dongu", no: 4, title: "Döngü Robotu", icon: "🔁", color: "#22a6a0",
+  id: "dongu", no: 4, title: "Döngü Robotu", icon: "dongu", color: "#22a6a0",
   screens: [kisalt, pist, tahmin, arduino, meyve, kumbara, yaz, gorev],
   ozet: ["for i in range(5): → 5 tur, 0'dan 4'e", "Arduino: for (int i = 0; i < 5; i++) → aynı 5 tur", "for meyve in sepet: → listeyi tek tek gez", "toplam = toplam + sayi → biriktir"]
 };

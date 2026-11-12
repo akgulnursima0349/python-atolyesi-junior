@@ -44,4 +44,4 @@ function ekran(k) {
   };
 }
 
-export const modelOyunu = { id: "model", ad: "Model Atölyesi", ikon: "🧪", renk: "#b39dff", dunya: "yz", tur: () => [1, 3, 3, 5].map(ekran) };
+export const modelOyunu = { id: "model", ad: "Model Atölyesi", ikon: "deney", renk: "#b39dff", dunya: "yz", tur: () => [1, 3, 3, 5].map(ekran) };

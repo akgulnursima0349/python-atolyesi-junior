@@ -4,6 +4,7 @@ import { say } from "../core/bit.js";
 import { soundButton } from "../core/sound.js";
 import { store } from "../core/store.js";
 import { KAZANIMLAR, puanla } from "../data/testler.js";
+import { ikon } from "../core/ikon.js";
 
 const ISARET = {
   ok: '<span class="r-mark r-ok" role="img" aria-label="Doğru" title="Doğru">✓</span>',
@@ -45,13 +46,13 @@ export function sonucSayfasi(root) {
     KAZANIMLAR.map((k, i) => {
       const a = on ? on[i] : "yok", b = son[i];
       const yeni = a !== "ok" && b === "ok";
-      return `<div class="r-row${yeni ? " yeni" : ""}" role="row"><span role="cell"><i>${k.ikon}</i>${k.kisa}</span><span role="cell">${ISARET[a]}</span><span role="cell">${ISARET[b]}</span></div>`;
+      return `<div class="r-row${yeni ? " yeni" : ""}" role="row"><span role="cell"><i>${ikon(k.ikon)}</i>${k.kisa}</span><span role="cell">${ISARET[a]}</span><span role="cell">${ISARET[b]}</span></div>`;
     }).join("");
   card.append(tablo);
   const yeniSay = KAZANIMLAR.filter((_, i) => (on ? on[i] : "yok") !== "ok" && son[i] === "ok").length;
   if (on && yeniSay) card.append(el("p", "r-note", `<b>${yeniSay}</b> konuyu kurs boyunca yeni öğrendin.`));
 
   const a = el("div", "actions center");
-  a.innerHTML = '<a class="btn" href="#sertifika">🏅 Sertifikanı al</a><a class="btn sec" href="#harita">Haritaya dön</a>';
+  a.innerHTML = `<a class="btn" href="#sertifika">${ikon("odul")}Sertifikanı al</a><a class="btn sec" href="#harita">Haritaya dön</a>`;
   card.append(a);
 }

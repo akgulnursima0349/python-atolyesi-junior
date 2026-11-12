@@ -44,4 +44,4 @@ function ekran(p) {
   };
 }
 
-export const hataOyunu = { id: "hata", ad: "Hata Avcısı", ikon: "🐞", renk: "#ff9d7a", dunya: "karar", tur: () => sec(HAVUZ, 4).map(ekran) };
+export const hataOyunu = { id: "hata", ad: "Hata Avcısı", ikon: "bocek", renk: "#ff9d7a", dunya: "karar", tur: () => sec(HAVUZ, 4).map(ekran) };

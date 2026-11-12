@@ -207,7 +207,7 @@ function yaz(ctx) {
 }
 
 export const karar = {
-  id: "karar", no: 3, title: "Karar Veren Robot", icon: "🔀", color: "#b39dff",
+  id: "karar", no: 3, title: "Karar Veren Robot", icon: "yol", color: "#b39dff",
   screens: [yol, dogruYanlis, fan, trafik, girinti, hataAvcisi, yaz],
   ozet: ['if hava == "yağmur": → koşul doğruysa çalışır', "else: → koşul yanlışsa çalışır", "elif → üçüncü bir yol", "içerdeki satırlar 4 boşluk girintili"]
 };

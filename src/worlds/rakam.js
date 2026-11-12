@@ -204,7 +204,7 @@ function sirala(ctx) {
 }
 
 export const rakam = {
-  id: "rakam", no: 8, title: "Rakam Okuyan Yapay Zekâ", icon: "✏️", color: "#7fd6d1",
+  id: "rakam", no: 8, title: "Rakam Okuyan Yapay Zekâ", icon: "kalem", color: "#7fd6d1",
   screens: [altmisDort, benzerlik, komsular, ciz, yanilma, dogruluk, sirala],
   ozet: ["Resim = 8×8 = 64 sayı", "Fark puanı küçükse resimler benzer", "KNN: en yakın k komşu oy verir", "Model görmediği verilerle sınanır"]
 };

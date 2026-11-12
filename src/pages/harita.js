@@ -6,6 +6,7 @@ import { store } from "../core/store.js";
 import { WORLDS, durum, durakDurumu } from "../worlds/index.js";
 import { salonAcik } from "../salon/index.js";
 import { hesapParcasi } from "../core/hesap.js";
+import { ikon } from "../core/ikon.js";
 import { bulut } from "../cloud/bulut.js";
 
 const KILIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>';
@@ -16,7 +17,7 @@ export function harita(root) {
   const top = el("header", "m-top home");
   top.innerHTML = `<div class="brand">Python Atölyesi <span>Junior</span></div>
     ${store.teacher() && bulut.mod !== "bulut" ? '<a class="teacher-tag" href="#ogretmen">Öğretmen modu</a>' : ""}
-    ${salonAcik() ? '<a class="salon-btn" href="#salon"><span aria-hidden="true">🎮</span><span class="sb-t">Oyun Salonu</span></a>' : ""}
+    ${salonAcik() ? `<a class="salon-btn" href="#salon">${ikon("oyun")}<span class="sb-t">Oyun Salonu</span></a>` : ""}
     <div class="score">${STAR}<span>${store.totalStars()}</span></div>`;
   const hesap = hesapParcasi();
   if (hesap) top.append(hesap);
@@ -24,9 +25,9 @@ export function harita(root) {
 
   /* yol: başlangıç testi → 10 dünya → bitiş testi → sertifika */
   const DURAK = {
-    on: { title: "Başlangıç testi", icon: "📝", color: "#ffd84d", hash: "test-on" },
-    son: { title: "Bitiş testi", icon: "🏁", color: "#ffd84d", hash: "test-son" },
-    sertifika: { title: "Sertifika", icon: "🏅", color: "#ff6b3d", hash: "sertifika" }
+    on: { title: "Başlangıç testi", icon: "test", color: "#ffd84d", hash: "test-on" },
+    son: { title: "Bitiş testi", icon: "bayrak", color: "#ffd84d", hash: "test-son" },
+    sertifika: { title: "Sertifika", icon: "odul", color: "#ff6b3d", hash: "sertifika" }
   };
   const yol = [{ durak: "on" }, ...WORLDS.map((w) => ({ w })), { durak: "son" }, { durak: "sertifika" }];
 
@@ -59,7 +60,7 @@ export function harita(root) {
       node.style.setProperty("--c", w.color);
       node.dataset.no = w.no;
       const etiket = { bitti: stars(Math.min(3, Math.ceil(store.worldStars(w.id) / 3))), acik: "Başla!", kilitli: "Kilitli", hazirlaniyor: "Yakında" }[d];
-      node.innerHTML = `<span class="orb"><span class="ico">${d === "kilitli" ? KILIT : w.icon}</span><span class="no">${w.no}</span></span>
+      node.innerHTML = `<span class="orb"><span class="ico">${d === "kilitli" ? KILIT : ikon(w.icon)}</span><span class="no">${w.no}</span></span>
         <span class="n-title">${w.title}</span><span class="n-state">${etiket}</span>`;
       node.setAttribute("aria-label", `Dünya ${w.no}: ${w.title}, ${DURUM_ADI[d]}`);
       node.onclick = () => {
@@ -73,7 +74,7 @@ export function harita(root) {
       node.style.setProperty("--c", D.color);
       node.dataset.durak = k;
       const etiket = d === "kilitli" ? "Kilitli" : d === "acik" ? "Başla!" : k === "on" ? "Bitti ✓" : k === "son" ? "Sonuçlar" : "Aç";
-      node.innerHTML = `<span class="orb"><span class="ico">${d === "kilitli" ? KILIT : D.icon}</span></span>
+      node.innerHTML = `<span class="orb"><span class="ico">${d === "kilitli" ? KILIT : ikon(D.icon)}</span></span>
         <span class="n-title">${D.title}</span><span class="n-state">${etiket}</span>`;
       node.setAttribute("aria-label", `${D.title}, ${DURUM_ADI[d]}`);
       node.onclick = () => {

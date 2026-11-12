@@ -240,7 +240,7 @@ function sirala(ctx) {
 }
 
 export const ressam = {
-  id: "ressam", no: 10, title: "Yapay Zekâ Ressamı", icon: "🎨", color: "#ff9d7a",
+  id: "ressam", no: 10, title: "Yapay Zekâ Ressamı", icon: "palet", color: "#ff9d7a",
   screens: [grupla, adimAdim, kimSoyler, sarj, renkler, popart, sirala],
   ozet: ["K-Means benzerleri gruplar", "k (n_clusters) grup sayısını biz veririz", "Merkezler grubun ortasına taşınır", "Renkleri gruplayınca pop-art olur"]
 };

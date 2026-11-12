@@ -197,7 +197,7 @@ function yaz(ctx) {
 }
 
 export const listeDunyasi = {
-  id: "liste", no: 5, title: "Vagonlar ve Dolaplar", icon: "🚃", color: "#ff8fab",
+  id: "liste", no: 5, title: "Vagonlar ve Dolaplar", icon: "tren", color: "#ff8fab",
   screens: [trenEkrani, vagonTahmin, eklec, makas, dolap, dolapTahmin, yaz],
   ozet: ["tren[0] → ilk vagon (sayım 0'dan)", 'tren.append("🐸") → sona ekle', "kelime[1:4] → parça kes", 'dolap["muz"] → etiketle bul']
 };
