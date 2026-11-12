@@ -797,3 +797,107 @@ label.btn input[hidden] { display: none }
 .px-ctrl { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; background: var(--code-bg); border-radius: 0 0 var(--r) var(--r); padding: 10px 12px 14px; margin-top: -14px }
 .px-ctrl label { display: inline-flex; align-items: center; gap: 6px; color: var(--code-dim); font: 700 13px var(--f-disp) }
 .px-left { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+
+/* ---------- Faz 6: giriş ---------- */
+.acilis { text-align: center; color: var(--ink-2); font-weight: 700; padding: 60px 0 }
+.giris-sec { display: grid; grid-template-columns: 1fr 1fr; gap: 14px }
+@media (max-width: 520px) { .giris-sec { grid-template-columns: 1fr } }
+.giris-kart { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 14px; border-radius: 20px; border: 3px solid var(--accent);
+  background: #fff4ef; color: var(--ink); font: inherit; cursor: pointer; transition: transform .12s }
+.giris-kart:hover { transform: translateY(-3px) }
+.giris-kart.sec { border-color: var(--robot); background: #e8f7f6 }
+.giris-kart span { font-size: 46px; line-height: 1 }
+.giris-kart b { font-size: 22px }
+.giris-kart small { color: var(--ink-2); font-weight: 600 }
+.g-form { display: flex; flex-direction: column; gap: 12px }
+.g-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 700 }
+.g-form input { font: 600 20px var(--f-disp); padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); min-width: 0 }
+.g-form input:focus { border-color: var(--robot); outline: none }
+#g-kod { text-transform: uppercase; letter-spacing: .12em; font-family: var(--f-code) }
+#g-pin { letter-spacing: .4em; font-family: var(--f-code); max-width: 180px }
+.g-alt { margin: 0; color: var(--ink-2) }
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--accent-2); font-weight: 700; text-decoration: underline; cursor: pointer }
+.deneme-not { margin: 0; font-size: 14px; color: var(--ink-2); background: var(--bg); border-radius: 12px; padding: 10px 14px; line-height: 1.6 }
+.deneme-not code { font-family: var(--f-code); background: var(--card); padding: 0 5px; border-radius: 5px; color: var(--ink) }
+.msg { border-radius: 12px; padding: 10px 14px; font-weight: 600 }
+.msg.bad { background: #fde9ea; color: #a92f33 }
+.msg.ok { background: #e3f5ea; color: #1f6e3f }
+
+/* hesap şeridi */
+.hesap { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border-radius: 99px; padding: 4px 4px 4px 12px; box-shadow: 0 2px 0 var(--line); font-weight: 700; font-size: 15px; min-width: 0 }
+.hesap-ad { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.hesap-durum { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: var(--line); color: var(--ink-2) }
+.hesap-durum[data-d="kaydedildi"] { background: #e3f5ea; color: var(--ok) }
+.hesap-durum[data-d="hata"] { background: #fde9ea; color: var(--bad) }
+.hesap-durum[data-d="hazir"] { display: none }
+.hesap-panel { text-decoration: none; padding: 4px 6px }
+.hesap-cik { border: 0; background: var(--bg); color: var(--ink); font: 700 14px var(--f-disp); padding: 7px 12px; border-radius: 99px; cursor: pointer }
+
+/* ---------- panel ---------- */
+.panel { gap: 14px }
+.tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--line); flex-wrap: wrap }
+.tab { text-decoration: none; font-weight: 700; padding: 8px 14px; border-radius: 12px 12px 0 0; color: var(--ink-2) }
+.tab.on { background: var(--bg); color: var(--ink); box-shadow: inset 0 -3px 0 var(--accent) }
+.yukleniyor, .bos-not { color: var(--ink-2); margin: 0 }
+.panel-govde { display: flex; flex-direction: column; gap: 14px }
+.sinif-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 12px }
+.sinif-kart { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--ink); border: 3px solid var(--line); border-radius: 18px; padding: 14px; transition: border-color .12s }
+.sinif-kart:hover { border-color: var(--robot) }
+.sinif-kart b { font-size: 19px }
+.sinif-kart small { color: var(--ink-2); font-weight: 600 }
+.kod-chip { align-self: flex-start; font: 700 15px var(--f-code); letter-spacing: .1em; background: var(--code-bg); color: var(--hl); padding: 2px 10px; border-radius: 8px }
+.yeni-sinif, .ogr-ekle { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--line); padding-top: 14px }
+.yeni-sinif label, .ogr-ekle label { font-weight: 700 }
+.yeni-sinif label small, .ogr-ekle label small { color: var(--ink-2); font-weight: 600 }
+.yeni-sinif .row { display: flex; gap: 10px; flex-wrap: wrap }
+.yeni-sinif input, .ogr-ekle textarea { flex: 1; min-width: 0; font: 600 18px var(--f-disp); padding: 10px 12px; border-radius: 12px; border: 2px solid var(--line); resize: vertical }
+.ogr-ekle { border-top: 0; padding-top: 0 }
+.sinif-ust { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--bg); border-radius: 16px; padding: 12px 16px }
+.sinif-ust small { display: block; font-weight: 700; color: var(--ink-2); font-size: 13px }
+.sinif-ust p { margin: 0; color: var(--ink-2); flex: 1; min-width: 200px }
+.kod-buyuk { font: 800 30px var(--f-code); letter-spacing: .14em }
+.ozet { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px }
+.ozet div { background: var(--bg); border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column }
+.ozet small { color: var(--ink-2); font-weight: 700 }
+.ozet b { font-size: 24px; font-variant-numeric: tabular-nums }
+.ozet-ara { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; color: var(--ink-2) }
+.btn.small { font-size: 15px; padding: 9px 14px; box-shadow: 0 3px 0 var(--line) }
+.tablo-sar { overflow-x: auto; border: 2px solid var(--line); border-radius: 14px }
+.ilerleme-tablo { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums }
+.ilerleme-tablo th, .ilerleme-tablo td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap }
+.ilerleme-tablo th[scope="row"] { text-align: left; padding-left: 12px; position: sticky; left: 0; background: var(--card); max-width: 160px; overflow: hidden; text-overflow: ellipsis }
+.ilerleme-tablo thead th { background: var(--bg); font-size: 13px; color: var(--ink-2) }
+.ilerleme-tablo thead th:first-child { position: sticky; left: 0; z-index: 1 }
+.ilerleme-tablo tfoot td, .ilerleme-tablo tfoot th { font-size: 13px; color: var(--ink-2); background: var(--bg); border-bottom: 0 }
+.w-ikon { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--c); color: var(--ink); font-weight: 800; font-size: 12px }
+.w-yildiz { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 8px; background: var(--c); font-weight: 800; font-size: 13px }
+.w-bos { display: inline-block; width: 26px; height: 26px; border-radius: 8px; border: 2px dashed var(--line) }
+.ilerleme-tablo .test { font-weight: 800 }
+.ilerleme-tablo .tarih { color: var(--ink-2); font-size: 13px }
+.ogr-liste { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 14px; overflow: hidden }
+.ogr-satir { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-top: 1px solid var(--line); flex-wrap: wrap }
+.ogr-satir:first-child { border-top: 0 }
+.ogr-satir b { flex: 1; min-width: 120px }
+.pin-chip { font: 700 17px var(--f-code); letter-spacing: .2em; background: var(--bg); padding: 4px 10px; border-radius: 8px; min-width: 76px; text-align: center }
+.ogt-liste { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 14px; overflow: hidden }
+.ogt-satir { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--line); flex-wrap: wrap }
+.ogt-satir:first-child { border-top: 0 }
+.ogt-satir > span { flex: 1; min-width: 160px }
+.ogt-satir small { color: var(--ink-2); font-weight: 600 }
+.ogt-satir.pasif b { color: var(--ink-2) }
+.etiket { font-size: 12px; font-weight: 800; background: var(--hl-soft); padding: 2px 8px; border-radius: 99px }
+.etiket.kapali { background: #fde9ea; color: var(--bad) }
+.pin-kartlar { display: none }
+@media print {
+  body.pin-yazdir #app > * { display: none !important }
+  body.pin-yazdir #app > main { display: block !important }
+  body.pin-yazdir main > :not(.panel-govde), body.pin-yazdir .panel-govde > :not(div:last-child) { display: none !important }
+  body.pin-yazdir .panel-govde > div:last-child > :not(.pin-kartlar) { display: none !important }
+  body.pin-yazdir .pin-kartlar { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 6mm }
+  .pin-kart { border: 2px dashed #888; border-radius: 4mm; padding: 4mm; display: flex; flex-direction: column; gap: 2mm; break-inside: avoid }
+  .pin-kart small { color: #555 }
+  .pin-kart b { font-size: 16pt }
+  .pin-kart div { display: flex; justify-content: space-between }
+  .pin-kart code { font: 700 14pt var(--f-code); letter-spacing: .1em }
+  body.pin-yazdir { background: #fff }
+}

@@ -32,6 +32,8 @@ npm run build    # dist/ klasörüne derler
 node test/e2e.cjs  # uçtan uca test (Playwright gerekir; önce build)
 ```
 
-Hesap yok; ilerleme tarayıcıda saklanır. Öğretmen sayfası (`#ogretmen`) bir cihazda bütün dünyaları açar.
+Hesaplar (Faz 6): öğrenci sınıf kodu + takma ad + PIN ile, öğretmen e-posta ile girer; ilerleme her cihazda aynıdır.
+Eski Python Atölyesi'nin Supabase projesi kullanılır, kurulum için `supabase/KURULUM.md`. `public/ayarlar.js` boş bırakılırsa
+site hesapsız çalışır (öğretmen sayfası `#ogretmen` bir cihazda bütün dünyaları açar); `{ mock: true }` tarayıcı içi sahte sunucuyu açar.
 Python kodları tarayıcıda Skulpt ile, yapay zekâ modelleri JavaScript ile çalışır; hiçbir veri dışarı gönderilmez.
 Şartnameler `docs/` klasöründe.

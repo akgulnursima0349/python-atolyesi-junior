@@ -328,11 +328,91 @@ async function oynaRessam(p, shot, fotograf) {
   await p.waitForSelector(".end"); await shot("d10_son");
 }
 
+/* public/ayarlar.js yerine verilen ayar: "{}" hesapsız, "{mock:true}" sahte sunucu */
+const ayar = (ctx, json) => ctx.route("**/ayarlar.js", (r) => r.fulfill({ contentType: "text/javascript", body: `window.JUNIOR_AYAR=${json};` }));
+
+async function hesapliMod(b, ad, vp) {
+  console.log(`\nhesaplı mod · ${ad}`);
+  const yeni = async (db) => {
+    const c = await b.newContext({ viewport: vp, hasTouch: ad !== "masaustu" });
+    await ayar(c, "{mock:true}");
+    if (db) await c.addInitScript((d) => { if (!localStorage.getItem("junior-sahte-db")) localStorage.setItem("junior-sahte-db", d); }, db);
+    const p = await c.newPage(); const errs = [];
+    p.on("pageerror", (e) => errs.push(String(e)));
+    p.on("console", (m) => { if (m.type() === "error" && !/fonts\.g|ERR_TUNNEL|net::/.test(m.text())) errs.push(m.text()); });
+    return { c, p, errs };
+  };
+  const shot = (p, n) => p.screenshot({ path: `${OUT}/${ad}_hesap_${n}.png` });
+  const tasma = (p) => p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+  const ogrGir = async (p, kod, isim, pin) => { await p.click("#g-ogr"); await p.fill("#g-kod", kod); await p.fill("#g-ad", isim); await p.fill("#g-pin", pin); await p.click("button[type=submit]"); };
+  const ogtGir = async (p, e) => { await p.click("#g-ogt"); await p.fill("#g-eposta", e); await p.fill("#g-sifre", "deneme123"); await p.click("button[type=submit]"); };
+
+  // 1. cihaz: öğrenci girişi, test ve Dünya 1
+  const A = await yeni();
+  let p = A.p;
+  await p.goto(URL + "#harita"); await p.waitForSelector(".giris-kart");
+  ok(true, "giriş yapılmadan harita yerine giriş ekranı açılıyor"); await shot(p, "giris");
+  await ogrGir(p, "deneme", "ece", "0000"); await p.waitForSelector(".msg.bad");
+  ok(/hatalı/.test(await p.textContent(".msg.bad")) && !/rpc|supabase|error/i.test(await p.textContent(".msg.bad")), "hatalı PIN sade Türkçe mesaj veriyor");
+  await p.fill("#g-pin", "1234"); await p.click("button[type=submit]"); await p.waitForSelector(".node");
+  ok((await p.textContent(".hesap-ad")) === "Ece", "haritada öğrencinin takma adı görünüyor");
+  ok(await p.isVisible('.node[data-no="1"].kilitli'), "öğrencide dünyalar sırayla (Dünya 1 kilitli)");
+  ok(!(await tasma(p)), "hesaplı haritada yatay taşma yok"); await shot(p, "harita");
+  await p.goto(URL + "#panel"); await p.waitForSelector(".node"); ok(true, "öğrenci paneli açamıyor");
+  await p.click('.node[data-durak="on"]'); await p.click("text=Başla ➜"); await testCoz(p, ON_CEVAP);
+  await p.click("text=Haritaya dön"); await p.click('.node[data-no="1"]'); await p.waitForSelector(".card .say");
+  await oynaDil(p, () => {}); await p.click("text=Haritaya dön"); await p.waitForSelector('.node[data-no="1"].bitti');
+  await p.waitForSelector('.hesap-durum[data-d="kaydedildi"]', { timeout: 8000 }); ok(true, "ilerleme buluta kaydedildi");
+  const db = await p.evaluate(() => localStorage.getItem("junior-sahte-db"));
+
+  // 2. cihaz: aynı öğrenci başka tarayıcıda
+  const B = await yeni(db);
+  await B.p.goto(URL); await B.p.waitForSelector(".giris-kart");
+  await ogrGir(B.p, "DENEME", "Ece", "1234"); await B.p.waitForSelector(".node");
+  ok(await B.p.isVisible('.node[data-no="1"].bitti') && await B.p.isVisible('.node[data-no="2"].acik'), "başka cihazda aynı yerden devam ediyor (Dünya 1 bitti, 2 açık)");
+  await B.p.click(".hesap-cik"); await B.p.waitForSelector(".giris-kart");
+  ok(await B.p.evaluate(() => { const s = JSON.parse(localStorage.getItem("atolye-junior-v1")); return !Object.keys(s.worlds).length; }), "çıkışta cihazdaki ilerleme siliniyor");
+
+  // öğretmen: panel, ilerleme tablosu, öğrenci ekleme, PIN
+  await ogtGir(B.p, "ogretmen@deneme.com"); p = B.p;
+  await p.waitForSelector(".sinif-kart"); await shot(p, "panel");
+  await p.click(".sinif-kart"); await p.waitForSelector(".ilerleme-tablo");
+  const ece = await p.$$eval(".ilerleme-tablo tbody tr", (r) => r.map((x) => x.textContent.replace(/\s+/g, " ").trim()).find((t) => t.startsWith("Ece")));
+  ok(/^Ece\s*5\s*[1-9]\b/.test(ece), `öğretmen Ece'nin başlangıç testini (5) ve Dünya 1 yıldızlarını görüyor: ${ece}`);
+  ok(!(await tasma(p)), "ilerleme tablosunda sayfa taşmıyor"); await shot(p, "ilerleme");
+  await p.click("text=Öğrenciler ve PIN'ler"); await p.waitForSelector(".ogr-ekle");
+  await p.fill("#oe-adlar", "Zeynep A.\nEce"); await p.click(".ogr-ekle .btn"); await p.waitForSelector(".msg.ok");
+  ok(/1 öğrenci eklendi.*Ece/.test(await p.textContent(".msg.ok")), "öğrenci ekleniyor, aynı ad atlanıyor");
+  ok(/••••/.test(await p.textContent('.ogr-satir[data-ogrenci="Zeynep A."] .pin-chip')), "PIN'ler gizli açılıyor");
+  await p.click("text=PIN'leri göster");
+  const pin = (await p.textContent('.ogr-satir[data-ogrenci="Zeynep A."] .pin-chip')).trim();
+  ok(/^\d{4}$/.test(pin), "PIN'leri göster ile PIN görünüyor"); await shot(p, "ogrenciler");
+  await p.goto(URL + "#harita"); await p.waitForSelector(".node");
+  ok((await p.$$(".node[data-no].acik")).length === 10, "öğretmen hesabında bütün dünyalar açık");
+  ok(await p.isVisible(".hesap-panel"), "öğretmenin haritasında Panel düğmesi var");
+  await p.click(".hesap-cik"); await p.waitForSelector(".giris-kart");
+  await ogrGir(p, "DENEME", "zeynep a.", pin); await p.waitForSelector(".node");
+  ok((await p.textContent(".hesap-ad")) === "Zeynep A.", "yeni eklenen öğrenci kendi PIN'iyle giriyor");
+  await p.click(".hesap-cik"); await p.waitForSelector(".giris-kart");
+
+  // müdür: bütün sınıflar, öğretmen erişimini kapatma
+  await ogtGir(p, "mudur@deneme.com"); await p.waitForSelector(".sinif-kart");
+  ok(/Deneme Öğretmen/.test(await p.textContent(".sinif-kart")), "müdür başka öğretmenin sınıfını görüyor");
+  await p.click("text=Öğretmenler"); await p.waitForSelector(".ogt-satir"); await shot(p, "mudur");
+  await p.click(".ogt-satir:has-text('Deneme Öğretmen') button"); await p.waitForSelector(".ogt-satir.pasif");
+  await p.click(".hesap-cik"); await p.waitForSelector(".giris-kart");
+  await ogtGir(p, "ogretmen@deneme.com"); await p.waitForSelector(".msg.bad");
+  ok(/erişimi.*kapatılmış/.test(await p.textContent(".msg.bad")), "erişimi kapatılan öğretmen giremiyor");
+  ok(A.errs.length + B.errs.length === 0, "hesaplı modda konsolda hata yok" + (A.errs.concat(B.errs).length ? ": " + A.errs.concat(B.errs).slice(0, 3).join(" | ") : ""));
+  await A.c.close(); await B.c.close();
+}
+
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
-  for (const [ad, vp, touch] of [["masaustu", { width: 1280, height: 860 }, false], ["tablet", { width: 820, height: 1180 }, true], ["telefon", { width: 390, height: 844 }, true]].filter(([a]) => !process.env.SADECE || process.env.SADECE === a)) {
+  for (const [ad, vp, touch] of [["masaustu", { width: 1280, height: 860 }, false], ["tablet", { width: 820, height: 1180 }, true], ["telefon", { width: 390, height: 844 }, true]].filter(([a]) => !process.env.HESAP && (!process.env.SADECE || process.env.SADECE === a))) {
     console.log(`\n${ad} (${vp.width}px)`);
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch });
+    await ayar(ctx, "{}"); // bu bölüm hesapsız (yerel) modu sınar
     const p = await ctx.newPage();
     const errs = [];
     p.on("pageerror", (e) => errs.push(String(e)));
@@ -459,8 +539,12 @@ async function oynaRessam(p, shot, fotograf) {
     ok(errs.length === 0, "konsolda hata yok" + (errs.length ? ": " + errs.slice(0, 3).join(" | ") : ""));
     await ctx.close();
   }
+  // hesaplı mod (tarayıcı içi sahte sunucuyla)
+  for (const [ad, vp] of [["masaustu", { width: 1280, height: 860 }], ["telefon", { width: 390, height: 844 }]].filter(([a]) => !process.env.SADECE || process.env.SADECE === a)) await hesapliMod(b, ad, vp);
+
   // depolama kapalıyken açılış
   const ctx = await b.newContext();
+  await ayar(ctx, "{}");
   await ctx.addInitScript(() => { Object.defineProperty(window, "localStorage", { get() { throw new Error("engelli"); } }); });
   const p = await ctx.newPage(); const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
   await p.goto(URL); await p.waitForSelector(".node");
