@@ -701,10 +701,32 @@ label.btn input[hidden] { display: none }
 .cert-foot b { min-height: 26px; border-bottom: 2px solid var(--ink); width: 100%; padding-bottom: 2px }
 .cert-foot span { font-size: 13px; color: var(--ink-2); font-weight: 700; letter-spacing: .08em; text-transform: uppercase }
 .cert-tip { margin: 0; text-align: center; color: var(--ink-2); font-size: 14px }
-.end-cover { width: 100%; max-width: 560px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px }
+.end-cover { background: #c4ecf0; width: 100%; max-width: 560px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px }
 
+/* Gemini süslü sertifika: geniş ekranda ve yazdırırken resmin krem alanına yazılır; telefonda sade kart kalır */
+.cert.resimli .cert-art { display: none }
+@media (min-width: 700px), print {
+  .cert.resimli { container-type: inline-size; aspect-ratio: 1600 / 893; padding: 0; border: 0; box-shadow: none; background: #fdf1dc; border-radius: 18px }
+  .cert.resimli .cert-art { display: block; opacity: 1; object-fit: fill }
+  .cert.resimli .cert-in { position: absolute; inset: 17% 13% 16% 13%; justify-content: center; gap: 1.1cqw }
+  .cert.resimli .cert-bit { display: none }
+  .cert.resimli .cert-top { text-align: center }
+  .cert.resimli .cert-kicker { font-size: 1.5cqw }
+  .cert.resimli .cert-course { font-size: 3cqw }
+  .cert.resimli .cert-small { font-size: 1.5cqw; margin: .4cqw 0 0 }
+  .cert.resimli .cert-name { font-size: 5cqw; padding: 0 2cqw .4cqw }
+  .cert.resimli .cert-text { font-size: 1.8cqw; max-width: 52cqw; margin: 0 }
+  .cert.resimli .cert-worlds { gap: .8cqw; margin: .4cqw 0 }
+  .cert.resimli .cert-worlds span { width: 3.6cqw; height: 3.6cqw; font-size: 1.9cqw }
+  .cert.resimli .cert-foot { max-width: 50cqw; margin-top: .8cqw; gap: 4cqw }
+  .cert.resimli .cert-foot b { min-height: 2.4cqw; font-size: 1.5cqw }
+  .cert.resimli .cert-foot span { font-size: 1.1cqw }
+}
 @media print {
   @page { size: A4 landscape; margin: 10mm }
+  .cert.resimli { height: auto !important; display: block !important; width: 100%; max-height: 185mm }
+  html, body, #app, .cert-wrap { min-height: 0 !important; height: auto !important }
+  .cert-wrap { gap: 0 !important; padding: 0 !important }
   body { background: #fff; padding: 0 }
   .no-print, #confetti { display: none !important }
   #app { max-width: none }

@@ -38,10 +38,11 @@ export function sertifikaSayfasi(root) {
     ust.append(say(`Tebrikler <b>${esc(store.ad())}</b>! Sertifikan hazır.`, "vay"));
     card.append(ust);
     const tarih = new Date().toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
-    const cert = el("section", "cert");
+    const resim = gorselEtiketi("sertifika", "cert-art").replace('loading="lazy"', 'loading="eager"'); // yazdırırken hazır olsun
+    const cert = el("section", "cert" + (resim ? " resimli" : ""));
     cert.setAttribute("aria-label", "Sertifika");
     cert.innerHTML = `
-      ${gorselEtiketi("sertifika", "cert-art")}
+      ${resim}
       <div class="cert-in">
         <div class="cert-top">${bitSvg("vay", "bit cert-bit")}<div><p class="cert-kicker">Başarı Sertifikası</p><p class="cert-course">Python Atölyesi <span>Junior</span></p></div></div>
         <p class="cert-small">Bu sertifika</p>
