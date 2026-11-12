@@ -60,6 +60,6 @@ function ekran(kelime, sondanMi) {
 }
 
 export const ajan = {
-  id: "ajan", ad: "Gizli Ajan", ikon: "🕵️", renk: "#7fd6d1", dunya: "liste",
+  id: "ajan", ad: "Gizli Ajan", ikon: "anahtar", renk: "#7fd6d1", dunya: "liste",
   tur: () => sec(KELIME, 3).map((k, i) => ekran(k, i === 2))
 };

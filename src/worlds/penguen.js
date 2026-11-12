@@ -203,7 +203,7 @@ function yaz(ctx) {
 }
 
 export const penguen = {
-  id: "penguen", no: 9, title: "Penguen Dedektifi", icon: "🐧", color: "#9fb8ff",
+  id: "penguen", no: 9, title: "Penguen Dedektifi", icon: "dedektif", color: "#9fb8ff",
   screens: [turler, ilkSoru, agac, sor, sinav, orman, yaz],
   ozet: ["Karar ağacı: soru soru ilerler", "İyi soru grupları temiz ayırır", "Model görmediği verilerle sınanır", "Rastgele orman: birçok ağaç oy verir"]
 };

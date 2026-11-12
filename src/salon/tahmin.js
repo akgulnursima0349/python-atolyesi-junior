@@ -37,4 +37,4 @@ function ekran(p) {
   };
 }
 
-export const tahminOyunu = { id: "tahmin", ad: "Çıktıyı Tahmin Et", ikon: "🔮", renk: "#ffd84d", dunya: "ilk", tur: () => sec(HAVUZ, 5).map(ekran) };
+export const tahminOyunu = { id: "tahmin", ad: "Çıktıyı Tahmin Et", ikon: "kristal", renk: "#ffd84d", dunya: "ilk", tur: () => sec(HAVUZ, 5).map(ekran) };

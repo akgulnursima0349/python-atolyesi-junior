@@ -202,7 +202,7 @@ function siraliPrint(ctx) {
 }
 
 export const dil = {
-  id: "dil", no: 1, title: "Bilgisayarın Dili", icon: "💡", color: "#ffb347",
+  id: "dil", no: 1, title: "Bilgisayarın Dili", icon: "binary", color: "#ffb347",
   screens: [tarif, lambalar, harfler, lambaTahmin, merdiven, cevirmen, siraliPrint],
   ozet: ["Program = sırayla yapılan komutlar", "Bilgisayar her şeyi 0 ve 1 ile saklar", "Python satır satır çalışır (yorumlayıcı)"]
 };

@@ -2,18 +2,18 @@
    Soru: { k: kazanım, soru (≤12 kelime), kod?: [satırlar], resim?: html, secenek: [..], dogru: sıra } */
 
 export const KAZANIMLAR = [
-  { k: 1, kisa: "Program nedir?", ikon: "📋" },
-  { k: 2, kisa: "Bilgisayarın dili", ikon: "💡" },
-  { k: 3, kisa: "Değişken ve metin", ikon: "📦" },
-  { k: 4, kisa: "Karar (if / else)", ikon: "🔀" },
-  { k: 5, kisa: "Döngü (for)", ikon: "🔁" },
-  { k: 6, kisa: "Listeler", ikon: "🚃" },
-  { k: 7, kisa: "Fonksiyonlar", ikon: "⚙️" },
-  { k: 8, kisa: "Hata bulma", ikon: "🐞" },
-  { k: 9, kisa: "Sınıf ve nesne", ikon: "🏭" },
-  { k: 10, kisa: "Yapay zekâ nasıl öğrenir?", ikon: "🧠" },
-  { k: 11, kisa: "Görmediği verilerle sınav", ikon: "📝" },
-  { k: 12, kisa: "Model türleri", ikon: "🐧" }
+  { k: 1, kisa: "Program nedir?", ikon: "sira" },
+  { k: 2, kisa: "Bilgisayarın dili", ikon: "binary" },
+  { k: 3, kisa: "Değişken ve metin", ikon: "kutu" },
+  { k: 4, kisa: "Karar (if / else)", ikon: "yol" },
+  { k: 5, kisa: "Döngü (for)", ikon: "dongu" },
+  { k: 6, kisa: "Listeler", ikon: "tren" },
+  { k: 7, kisa: "Fonksiyonlar", ikon: "fabrika" },
+  { k: 8, kisa: "Hata bulma", ikon: "bocek" },
+  { k: 9, kisa: "Sınıf ve nesne", ikon: "fabrika" },
+  { k: 10, kisa: "Yapay zekâ nasıl öğrenir?", ikon: "beyin" },
+  { k: 11, kisa: "Görmediği verilerle sınav", ikon: "test" },
+  { k: 12, kisa: "Model türleri", ikon: "dedektif" }
 ];
 
 const adimlar = (a) => `<div class="t-steps">${a.map((s, i) => `<span><b>${i + 1}</b>${s}</span>`).join("")}</div>`;

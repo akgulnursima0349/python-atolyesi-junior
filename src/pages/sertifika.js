@@ -5,6 +5,7 @@ import { sfx, soundButton } from "../core/sound.js";
 import { store } from "../core/store.js";
 import { WORLDS } from "../worlds/index.js";
 import { gorselEtiketi } from "../core/gorseller.js";
+import { ikon } from "../core/ikon.js";
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -48,12 +49,12 @@ export function sertifikaSayfasi(root) {
         <p class="cert-small">Bu sertifika</p>
         <h2 class="cert-name">${esc(store.ad())}</h2>
         <p class="cert-text">adlı öğrencinin <b>10 dünyanın hepsini</b> bitirip <b>${store.totalStars()} yıldız</b> topladığını gösterir.</p>
-        <div class="cert-worlds" aria-hidden="true">${WORLDS.map((w) => `<span style="--c:${w.color}">${w.icon}</span>`).join("")}</div>
+        <div class="cert-worlds" aria-hidden="true">${WORLDS.map((w) => `<span style="--c:${w.color}">${ikon(w.icon)}</span>`).join("")}</div>
         <div class="cert-foot"><div><b>${tarih}</b><span>Tarih</span></div><div><b class="sign"></b><span>Eğitmen</span></div></div>
       </div>`;
     card.append(cert);
     const a = el("div", "actions center no-print");
-    const yaz = el("button", "btn", "🖨️ Yazdır");
+    const yaz = el("button", "btn", ikon("yazici") + "Yazdır");
     yaz.onclick = () => window.print();
     const degis = el("button", "btn sec", "Adı değiştir");
     degis.onclick = () => adSor();

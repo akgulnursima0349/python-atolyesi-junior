@@ -97,6 +97,6 @@ function ekran(tip) {
 }
 
 export const piksel = {
-  id: "piksel", ad: "Piksel Sanatı", ikon: "🎨", renk: "#ff8fab", dunya: "dongu",
+  id: "piksel", ad: "Piksel Sanatı", ikon: "izgara", renk: "#ff8fab", dunya: "dongu",
   tur: () => [...karistir(["yatay", "dikey"]), Math.random() < 0.5 ? "kare" : "capraz"].map(ekran)
 };

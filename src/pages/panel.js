@@ -1,4 +1,5 @@
 /* Öğretmen paneli: sınıflar, sınıfın Junior ilerlemesi, öğrenciler ve PIN'ler; müdürde öğretmenler. */
+import { ikon } from "../core/ikon.js";
 import { el, $, $$ } from "../core/ui.js";
 import { say } from "../core/bit.js";
 import { bulut, panelApi, hataMetni } from "../cloud/bulut.js";
@@ -114,7 +115,7 @@ function ilerleme(kap, liste, yenile) {
   ozet.innerHTML = `<div><small>Başlangıç testi ort.</small><b>${ort("on")}</b></div><div><small>Bitiş testi ort.</small><b>${ort("son")}</b></div>
     <div><small>Kursu bitiren</small><b>${bitiren[bitiren.length - 1]} / ${n}</b></div>`;
   const ara = el("div", "ozet-ara");
-  const yb = el("button", "btn sec small", "↻ Yenile"); yb.onclick = yenile;
+  const yb = el("button", "btn sec small", ikon("yenile") + "Yenile"); yb.onclick = yenile;
   ara.append(el("small", "", "Sayılar dünya yıldızları; boş kutu: henüz bitmedi."), yb);
   const sar = el("div", "tablo-sar");
   sar.innerHTML = `<table class="ilerleme-tablo">
@@ -151,8 +152,8 @@ function ogrenciler(kap, sinif, liste, yenile) {
   if (!liste.length) return;
 
   const arac = el("div", "ozet-ara");
-  const goster = el("button", "btn sec small", "👁 PIN'leri göster");
-  const yazdir = el("button", "btn sec small", "🖨️ PIN kartlarını yazdır");
+  const goster = el("button", "btn sec small", ikon("goz") + "PIN'leri göster");
+  const yazdir = el("button", "btn sec small", ikon("yazici") + "PIN kartlarını yazdır");
   arac.append(goster, yazdir);
   kap.append(arac);
   const tablo = el("div", "ogr-liste pinler-gizli");
@@ -179,7 +180,7 @@ function ogrenciler(kap, sinif, liste, yenile) {
   const pinCiz = (acik) => $$(".pin-chip", tablo).forEach((c) => { if (c.dataset.pin) c.textContent = acik ? c.dataset.pin : "••••"; });
   goster.onclick = () => {
     const acik = tablo.classList.toggle("pinler-gizli") === false;
-    pinCiz(acik); goster.textContent = acik ? "🙈 PIN'leri gizle" : "👁 PIN'leri göster";
+    pinCiz(acik); goster.innerHTML = acik ? ikon("gozKapali") + "PIN'leri gizle" : ikon("goz") + "PIN'leri göster";
   };
   /* yazdırılacak kartlar: yalnızca yazdırırken görünür */
   const kartlar = el("section", "pin-kartlar");

@@ -1,7 +1,9 @@
 /* Giriş: öğrenci (sınıf kodu + takma ad + PIN) ya da öğretmen (e-posta + şifre). */
+import { ikon } from "../core/ikon.js";
 import { el, $ } from "../core/ui.js";
 import { say } from "../core/bit.js";
 import { sfx, soundButton } from "../core/sound.js";
+import { gorsel } from "../core/gorseller.js";
 import { bulut, hataMetni, ogrenciGiris, ogretmenGiris, ogretmenKaydol, ogretmenTamamla, tamamlanmamisHesap } from "../cloud/bulut.js";
 
 const SON_SINIF = "atolye-junior-son-sinif";
@@ -11,10 +13,21 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 
 export function girisSayfasi(root) {
   root.innerHTML = "";
-  const top = el("header", "m-top", '<div class="brand">Python Atölyesi <span>Junior</span></div>');
-  top.append(soundButton());
-  const card = el("main", "card narrow giris");
-  root.append(top, card);
+  /* iki sütun: solda kurum ve kurs kimliği, sağda form (telefonda üst üste) */
+  const sahne = el("div", "giris-sahne");
+  const logo = gorsel("logo"), resim = gorsel("giris") || gorsel("oyun-bot");
+  const marka = el("section", "giris-marka");
+  marka.innerHTML = `${logo ? `<img class="g-logo" src="${logo}" alt="Sivas Robotik Akademi">` : ""}
+    <h1>Python Atölyesi <span>Junior</span></h1>
+    <p>4–6. sınıflar için adım adım Python ve yapay zekâ.</p>
+    ${resim ? `<img class="g-resim" src="${resim}" alt="" decoding="async">` : ""}`;
+  const ses = el("div", "giris-ses"); ses.append(soundButton());
+  marka.append(ses);
+  const sag = el("div", "giris-sag");
+  const card = el("main", "card giris");
+  sag.append(card);
+  sahne.append(marka, sag);
+  root.append(sahne);
 
   const bas = (metin, mood = "mutlu") => { card.innerHTML = ""; card.append(say(metin, mood)); };
   const mesaj = (m, tur = "bad") => { let d = $(".msg", card); if (!d) { d = el("div", "msg"); card.append(d); } d.className = "msg " + tur; d.innerHTML = m; d.setAttribute("role", "alert"); };
@@ -23,8 +36,8 @@ export function girisSayfasi(root) {
   function secim() {
     bas("Merhaba, ben <b>Bit</b>! Sen kimsin?");
     const r = el("div", "giris-sec");
-    r.innerHTML = `<button class="giris-kart" id="g-ogr"><span>🎒</span><b>Öğrenciyim</b><small>Sınıf kodu ve PIN ile</small></button>
-      <button class="giris-kart sec" id="g-ogt"><span>🧑‍🏫</span><b>Öğretmenim</b><small>E-posta ve şifre ile</small></button>`;
+    r.innerHTML = `<button class="giris-kart" id="g-ogr">${ikon("canta", "ik gk-ik")}<b>Öğrenciyim</b><small>Sınıf kodu ve PIN ile</small></button>
+      <button class="giris-kart sec" id="g-ogt">${ikon("kep", "ik gk-ik")}<b>Öğretmenim</b><small>E-posta ve şifre ile</small></button>`;
     card.append(r);
     $("#g-ogr", r).onclick = ogrenci;
     $("#g-ogt", r).onclick = () => ogretmen();

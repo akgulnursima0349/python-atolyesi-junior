@@ -1,5 +1,6 @@
 /* Başlangıç ve bitiş testi: ekran başına bir soru, doğru/yanlış gösterilmez (ölçüyoruz).
    Her cevap hemen kaydedilir; sayfa yenilenirse kalınan sorudan devam edilir. */
+import { ikon } from "../core/ikon.js";
 import { el, $, hl, wait, confetti } from "../core/ui.js";
 import { say, bitSvg } from "../core/bit.js";
 import { sfx, soundButton } from "../core/sound.js";
@@ -36,7 +37,7 @@ export function testSayfasi(root, tur) {
       : tur === "on" ? "Önce <b>12 kısa soru</b>. Bilmiyorsan <b>Bilmiyorum</b>'a bas!"
         : "Son kez <b>12 soru</b>. Bakalım ne kadar öğrendin!", "mutlu"));
     const kutu = el("div", "t-intro");
-    kutu.innerHTML = `${bitSvg("vay", "bit bit-xl")}<div class="t-rules"><span>❓ 12 soru</span><span>🤷 Bilmiyorum serbest</span><span>⏱️ Acele yok</span></div>`;
+    kutu.innerHTML = `${bitSvg("vay", "bit bit-xl")}<div class="t-rules"><span>${ikon("liste")}12 soru</span><span>${ikon("soru")}Bilmiyorum serbest</span><span>${ikon("saat")}Acele yok</span></div>`;
     const a = el("div", "actions center");
     const b = el("button", "btn", devam ? "Devam et ➜" : "Başla ➜");
     b.onclick = soru;
@@ -70,7 +71,7 @@ export function testSayfasi(root, tur) {
       b.onclick = () => sec(k, b);
       opts.append(b);
     });
-    const bilmem = el("button", "btn sec t-idk", "🤷 Bilmiyorum");
+    const bilmem = el("button", "btn sec t-idk", ikon("soru") + "Bilmiyorum");
     bilmem.onclick = () => sec(-1, bilmem);
     govde.append(opts);
     const alt = el("div", "actions center");

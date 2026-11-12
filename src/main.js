@@ -10,10 +10,11 @@ import { salonSayfasi, oyunSayfasi } from "./pages/salon.js";
 import { oyunBul, oyunAcik, dunyaOyunu } from "./salon/index.js";
 import { bulut, bulutBaslat } from "./cloud/bulut.js";
 import { girisSayfasi } from "./pages/giris.js";
+import { ikon } from "./core/ikon.js";
 import { panelSayfasi, sinifSayfasi } from "./pages/panel.js";
 
 /* dünya bitince açılan oyunu bitiş ekranında haber ver */
-const yeniOyun = (w) => { const o = dunyaOyunu(w.id); return o ? `<a class="yeni-oyun" href="#oyun-${o.id}"><span>${o.ikon}</span><span><small>Oyun Salonu'nda açıldı</small><b>${o.ad}</b></span></a>` : ""; };
+const yeniOyun = (w) => { const o = dunyaOyunu(w.id); return o ? `<a class="yeni-oyun" href="#oyun-${o.id}"><span class="yo-ik">${ikon(o.ikon)}</span><span><small>Oyun Salonu'nda açıldı</small><b>${o.ad}</b></span></a>` : ""; };
 
 const root = document.getElementById("app");
 

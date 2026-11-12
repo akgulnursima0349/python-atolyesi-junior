@@ -53,4 +53,4 @@ function ekran(m) {
   };
 }
 
-export const bot = { id: "bot", ad: "Sohbet Botu", ikon: "💬", renk: "#7fc8ff", dunya: "fonk", tur: () => sec(MESAJ, 4).map(ekran) };
+export const bot = { id: "bot", ad: "Sohbet Botu", ikon: "bot", renk: "#7fc8ff", dunya: "fonk", tur: () => sec(MESAJ, 4).map(ekran) };

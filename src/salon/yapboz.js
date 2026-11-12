@@ -48,4 +48,4 @@ function ekran(p) {
   };
 }
 
-export const yapboz = { id: "yapboz", ad: "Kod Yapbozu", ikon: "🧩", renk: "#8fd694", dunya: "dil", tur: () => sec(HAVUZ, 3).map(ekran) };
+export const yapboz = { id: "yapboz", ad: "Kod Yapbozu", ikon: "yapboz", renk: "#8fd694", dunya: "dil", tur: () => sec(HAVUZ, 3).map(ekran) };

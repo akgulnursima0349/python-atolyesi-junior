@@ -180,7 +180,7 @@ function yaz(ctx) {
 }
 
 export const ilk = {
-  id: "ilk", no: 2, title: "Python'un İlk Sözleri", icon: "💬", color: "#7fc8ff",
+  id: "ilk", no: 2, title: "Python'un İlk Sözleri", icon: "mesaj", color: "#7fc8ff",
   screens: [yazdir, tirnak, kutu, degisir, hesap, birlestir, yaz],
   ozet: ['print("Merhaba") → ekrana yazar', 'isim = "Ada" → kutuya koyar', "puan = puan + 3 → kutu değişir", '"Ha" * 3 → HaHaHa']
 };

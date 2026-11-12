@@ -1,6 +1,6 @@
 /* Yapay zekâ görselleri: src/assets/img klasöründe olanlar paketlenir, olmayanlar için null döner.
    Böylece görsel gelmeden de site kırık resim göstermez. */
-const DOSYALAR = import.meta.glob("../assets/img/*.{webp,png,jpg,jpeg}", { eager: true, query: "?url", import: "default" });
+const DOSYALAR = import.meta.glob("../assets/img/*.{webp,png,jpg,jpeg,svg}", { eager: true, query: "?url", import: "default" });
 const ADLAR = {};
 for (const [yol, url] of Object.entries(DOSYALAR)) ADLAR[yol.split("/").pop().replace(/\.\w+$/, "")] = url;
 

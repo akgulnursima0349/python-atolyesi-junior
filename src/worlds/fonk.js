@@ -182,7 +182,7 @@ function yaz(ctx) {
 }
 
 export const fonk = {
-  id: "fonk", no: 6, title: "Makineler ve Fabrikalar", icon: "🏭", color: "#8fd694",
+  id: "fonk", no: 6, title: "Makineler ve Fabrikalar", icon: "fabrika", color: "#8fd694",
   screens: [makineEkrani, parametre, geriVer, fonkTahmin, kalip, yetenek, yaz],
   ozet: ["def selam_ver(): → komut paketi tanımla", 'selam_ver("Ada") → parametreyle çağır', "return → sonucu geri ver", 'r1 = Robot("mavi") → kalıptan nesne üret']
 };

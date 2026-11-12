@@ -1,4 +1,5 @@
 /* Öğretmen sayfası: bu cihazda bütün dünyaları açar. Hesap yok; kod yalnızca çocukların yanlışlıkla atlamasını önler. */
+import { ikon } from "../core/ikon.js";
 import { el, $ } from "../core/ui.js";
 import { say } from "../core/bit.js";
 import { soundButton, sfx } from "../core/sound.js";
@@ -37,7 +38,7 @@ export function ogretmen(root) {
       card.append(row);
     }
     if (store.testBitti("son")) {
-      const r = el("a", "btn sec", "📊 Bu cihazdaki test sonuçları"); r.href = "#sonuc";
+      const r = el("a", "btn sec", ikon("liste") + "Bu cihazdaki test sonuçları"); r.href = "#sonuc";
       const sat = el("div", "actions"); sat.append(r); card.append(sat);
     }
     /* paylaşılan bilgisayarlar için: ilerlemeyi sıfırla (iki adımlı onay) */
