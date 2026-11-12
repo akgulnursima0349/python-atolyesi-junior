@@ -712,3 +712,88 @@ label.btn input[hidden] { display: none }
   .cert { height: 186mm; display: flex; flex-direction: column; justify-content: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid }
   .cert-worlds span { -webkit-print-color-adjust: exact; print-color-adjust: exact }
 }
+
+/* ---------- Faz 5b: Oyun Salonu ---------- */
+.salon-btn { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; text-decoration: none; color: #fff; background: var(--accent);
+  padding: 8px 14px; border-radius: 99px; box-shadow: 0 3px 0 var(--accent-2); white-space: nowrap }
+.salon-btn span:first-child { font-size: 18px; line-height: 1 }
+@media (max-width: 520px) { .m-top.home .brand { flex-basis: 100% } .m-top.home { gap: 8px } }
+.salon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 14px }
+.oyun-kart { display: flex; flex-direction: column; align-items: stretch; gap: 6px; text-decoration: none; color: var(--ink); background: var(--card); border: 3px solid var(--line);
+  border-radius: 20px; padding: 10px 10px 12px; font: inherit; text-align: center; cursor: pointer; transition: transform .12s, border-color .12s }
+.oyun-kart:hover { transform: translateY(-3px); border-color: var(--c) }
+.oyun-ust { display: grid; place-items: center; aspect-ratio: 1 / 1; border-radius: 14px; background: var(--c); overflow: hidden; box-shadow: inset 0 -8px 0 rgba(0, 0, 0, .12) }
+.oyun-ikon { font-size: 64px; line-height: 1 }
+.oyun-ikon svg { width: 46px; height: 46px; color: #fff }
+.oyun-resim { width: 100%; height: 100%; object-fit: cover }
+.oyun-ad { font-weight: 800; font-size: 18px }
+.oyun-alt { font-size: 14px; font-weight: 700; color: var(--ink-2); display: inline-flex; justify-content: center; align-items: center; gap: 2px; min-height: 22px }
+.oyun-alt .star { width: 18px; height: 18px }
+.oyun-kart.kilitli .oyun-ust { background: #c9d4e3 }
+.oyun-kart.kilitli .oyun-ad { color: var(--ink-2) }
+@media (max-width: 520px) { .salon-grid { grid-template-columns: 1fr 1fr; gap: 10px } .oyun-ikon { font-size: 48px } .oyun-ad { font-size: 15px } }
+.yeni-oyun { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); background: var(--hl-soft); border: 2px solid #f1df8f;
+  border-radius: 16px; padding: 10px 18px; text-align: left; animation: pop .5s }
+.yeni-oyun > span:first-child { font-size: 34px }
+.yeni-oyun small { display: block; font-size: 13px; color: var(--ink-2); font-weight: 700 }
+.yeni-oyun b { font-size: 19px }
+
+/* yapboz */
+.yap .kart.is-code { white-space: pre }
+.hedef-cikti { background: var(--code-bg); color: var(--code-fg); border-radius: var(--r); padding: 14px 20px; font: 600 18px/1.6 var(--f-code); min-width: 220px; max-width: 92%;
+  display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere }
+.hedef-cikti .out-label { color: var(--code-dim); margin-bottom: 4px }
+.hedef-cikti div { opacity: .55; border-left: 4px solid transparent; padding-left: 8px; transition: opacity .2s }
+.hedef-cikti div.yandi { opacity: 1; border-left-color: var(--ok) }
+.hedef-cikti.tamam { box-shadow: 0 0 0 4px var(--ok) }
+
+/* tahmin */
+.big-q { font: 800 clamp(40px, 8vw, 64px) var(--f-code); color: var(--ink-2); text-align: center; padding: 0 12px; overflow-wrap: anywhere }
+.big-q.win { color: var(--accent); animation: pop .4s }
+
+/* piksel */
+.piksel { gap: 12px; padding: 14px }
+.px-wrap { display: grid; grid-template-columns: 22px repeat(8, minmax(0, 1fr)); gap: 3px; width: 100%; max-width: 340px }
+.px-wrap > b { font: 700 12px var(--f-code); color: var(--ink-2); display: grid; place-items: center }
+.px { aspect-ratio: 1 / 1; border-radius: 5px; background: #fff; border: 2px solid #d3e3ec; display: block }
+.px.hedef { border: 2px dashed var(--accent); background: #fff3ee }
+.px.boyali { background: var(--robot); border: 2px solid var(--robot-2); animation: pop .2s }
+.px.hedef.boyali { background: var(--ok); border-color: #237a45 }
+.px-legend { display: flex; gap: 16px; font-size: 14px; font-weight: 700; color: var(--ink-2) }
+.px-legend span { display: inline-flex; align-items: center; gap: 6px }
+.px-legend .px { width: 18px }
+
+/* ajan */
+.ajan { flex-direction: column; gap: 18px; padding: 20px 12px }
+.aj-code { background: var(--code-bg); color: var(--code-fg); border-radius: var(--r); padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  font: 600 18px var(--f-code); max-width: 100% }
+.kw-p { color: #7fd6ff }
+.aj-plus { color: var(--code-dim) }
+.aj-slot { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; background: var(--code-row); border-radius: 10px; padding: 4px 8px; min-width: 52px }
+.aj-slot code { font: inherit; color: var(--hl); font-size: 15px }
+.aj-slot b { min-height: 26px; min-width: 22px; border-bottom: 2px dashed var(--code-dim); text-align: center; font-size: 22px; color: #b7f08a }
+.aj-slot.dolu b { border-bottom-color: transparent; animation: pop .25s }
+.aj-train { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px }
+.aj-wagon { width: 58px; height: 70px; border-radius: 12px 12px 8px 8px; border: 3px solid var(--robot-2); background: var(--card); cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; font: inherit; color: var(--ink); box-shadow: 0 5px 0 var(--robot-2); touch-action: manipulation; transition: transform .15s }
+.aj-wagon small { font: 700 13px var(--f-code); color: #fff; background: var(--robot); border-radius: 6px; padding: 0 6px }
+.aj-wagon span { font-size: 26px; font-weight: 800 }
+.aj-wagon.hop { transform: translateY(-8px) }
+.aj-wagon.nope { animation: shake .35s; border-color: var(--bad) }
+.aj-wagon:disabled { opacity: .6; cursor: default }
+.aj-msg { font-size: 22px; min-height: 30px }
+.aj-msg b { color: var(--accent-2); font-size: 28px }
+
+/* bot */
+.chat { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; padding: 16px }
+.msg-sen, .msg-bot { padding: 10px 16px; border-radius: 18px; font-weight: 700; font-size: 19px; max-width: 85%; overflow-wrap: anywhere }
+.msg-sen { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px }
+.msg-bot { align-self: flex-start; background: var(--card); border: 2px solid var(--line); border-bottom-left-radius: 4px; animation: pop .3s }
+.msg-bot.bekle { color: var(--ink-2); letter-spacing: .2em }
+
+.px-code .ln { white-space: pre }
+.pv { color: var(--hl); background: rgba(255, 216, 77, .16); border-radius: 6px; padding: 0 4px; transition: background .2s }
+.pv.flash { background: rgba(255, 216, 77, .5) }
+.px-ctrl { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; background: var(--code-bg); border-radius: 0 0 var(--r) var(--r); padding: 10px 12px 14px; margin-top: -14px }
+.px-ctrl label { display: inline-flex; align-items: center; gap: 6px; color: var(--code-dim); font: 700 13px var(--f-disp) }
+.px-left { display: flex; flex-direction: column; gap: 14px; min-width: 0 }

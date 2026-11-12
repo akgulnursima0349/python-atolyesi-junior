@@ -8,12 +8,13 @@ import { sfx, soundButton } from "./sound.js";
 import { store } from "./store.js";
 import { gorselEtiketi } from "./gorseller.js";
 
-export function playWorld(world, root, { onExit }) {
+export function playWorld(world, root, opts = {}) {
   let at = 0, kazanilan = 0;
   root.innerHTML = "";
   const top = el("header", "w-top");
-  const back = el("a", "back", "← <span>Harita</span>"); back.href = "#harita"; back.setAttribute("aria-label", "Haritaya dön");
-  const title = el("div", "w-title", `<span>Dünya ${world.no}</span>${world.title}`);
+  const geri = world.geri || { href: "#harita", ad: "Harita", aria: "Haritaya dön" };
+  const back = el("a", "back", `← <span>${geri.ad}</span>`); back.href = geri.href; back.setAttribute("aria-label", geri.aria);
+  const title = el("div", "w-title", `<span>${world.ust || "Dünya " + world.no}</span>${world.title}`);
   const dots = el("div", "dots"), sc = el("div", "score");
   top.append(back, title, dots, sc, soundButton());
   const card = el("main", "card");
@@ -62,6 +63,10 @@ export function playWorld(world, root, { onExit }) {
   }
 
   function finish() {
+    if (world.bitis) {
+      dots.innerHTML = world.screens.map(() => '<span class="dot on"></span>').join("");
+      return world.bitis(card, kazanilan, () => { kazanilan = 0; go(0); });
+    }
     store.completeWorld(world.id, kazanilan);
     dots.innerHTML = world.screens.map(() => '<span class="dot on"></span>').join("");
     const kapak = gorselEtiketi("dunya-" + world.no, "end-cover");
@@ -69,6 +74,7 @@ export function playWorld(world, root, { onExit }) {
       <h2>${world.title} bitti!</h2>
       <p class="end-stars">${stars(Math.min(kazanilan, 10))} <b>${kazanilan} yıldız</b></p>
       <ul>${(world.ozet || []).map((s) => `<li>${s}</li>`).join("")}</ul>
+      ${opts.sonEk ? opts.sonEk(world) : ""}
       <div class="actions center"><a class="btn" href="#harita">Haritaya dön ➜</a><button class="btn sec" id="again">↺ Baştan oyna</button></div></div>`;
     confetti(); sfx.dogru();
     $("#again", card).onclick = () => { kazanilan = 0; go(0); };

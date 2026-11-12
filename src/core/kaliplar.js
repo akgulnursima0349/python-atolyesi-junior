@@ -5,6 +5,9 @@ import { sfx } from "./sound.js";
 import { editor } from "./editor.js";
 import { run, hazirla } from "./python.js";
 
+/* yildiz bir sayı ya da (oyunlarda) ilk denemeye bakan bir fonksiyon olabilir */
+const yildizSay = (y, varsayilan) => (typeof y === "function" ? y() : y ?? varsayilan);
+
 /* Tahmin: kod + seçenekler. Yanlış seçeneğin kendi ipucu var; doğru seçilince oynat() animasyonu çalışır.
    o = { soru, kod: [satır], secenekler: [{ t, dogru?, ipucu? }], sahne?: (st) => void, oynat?: async (cp, st) => void,
          basari, rozet, yildiz = 1 } */
@@ -18,10 +21,10 @@ export function tahminEkrani(ctx, o) {
   o.secenekler.forEach((s) => {
     const b = el("button", "opt" + (s.genis ? " wide" : ""), s.t);
     b.onclick = async () => {
-      if (!s.dogru) { b.classList.add("no"); sfx.yanlis(); ctx.say(s.ipucu || "Bir daha düşün!", "uzgun"); return; }
+      if (!s.dogru) { b.classList.add("no"); sfx.yanlis(); ctx.say(s.ipucu || "Bir daha düşün!", "uzgun"); if (o.yanlis) o.yanlis(); return; }
       b.classList.add("ok"); $$("button", opts).forEach((x) => (x.disabled = true)); sfx.tik(3);
       if (o.oynat) await o.oynat(cp, st);
-      ctx.say(o.basari, "vay"); f.done(o.yildiz || 1, STAR + " " + (o.rozet || "doğru tahmin"));
+      ctx.say(o.basari, "vay"); f.done(yildizSay(o.yildiz, 1), STAR + " " + (o.rozet || "doğru tahmin"));
     };
     opts.append(b);
   });
@@ -49,6 +52,7 @@ export function siralaEkrani(ctx, o) {
     o.karisik.forEach((i) => {
       if (secilen.includes(i)) return;
       const b = el("button", "kart" + (o.kod ? " is-code" : ""), o.kartlar[i]);
+      b.dataset.i = i;
       b.onclick = () => { secilen.push(i); sfx.tik(secilen.length); ciz(); };
       havuz.append(b);
     });
@@ -66,7 +70,7 @@ export function siralaEkrani(ctx, o) {
   calis.onclick = async () => {
     calis.disabled = true;
     const dogru = await o.calistir([...secilen], st);
-    if (dogru) { ctx.say(o.basari, "vay"); f.done(o.yildiz || 1, STAR + " " + (o.rozet || "sıraladın")); }
+    if (dogru) { ctx.say(o.basari, "vay"); f.done(yildizSay(o.yildiz, 1), STAR + " " + (o.rozet || "sıraladın")); }
     else { sfx.yanlis(); calis.disabled = false; calis.textContent = "▶ Tekrar çalıştır"; }
   };
   return { f, st };

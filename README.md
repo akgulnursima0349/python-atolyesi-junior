@@ -19,6 +19,9 @@ Sivas Robotik Akademi · 4–6. sınıflar için oyunlu Python ve yapay zekâ ku
 Kurs başlangıç testiyle açılır, bitiş testi ve sertifikayla kapanır. İki test aynı 12 kazanımı eş sorularla ölçer;
 sonuç ekranı başta ve sonda kazanım kazanım karşılaştırır.
 
+Oyun Salonu'nda 7 kısa oyun var (Kod Yapbozu, Çıktıyı Tahmin Et, Hata Avcısı, Piksel Sanatı, Gizli Ajan, Sohbet Botu,
+Model Atölyesi); her biri ait olduğu dünya bitince açılır ve istenildiği kadar tekrar oynanır.
+
 Yapay zekâ görselleri `src/assets/img/` klasörüne konur (adlar oradaki BENIOKU'da); olmayan görselin yeri görünmez.
 
 ## Çalıştırma
