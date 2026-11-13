@@ -80,6 +80,24 @@ export function playWorld(world, root, opts = {}) {
     $("#again", card).onclick = () => { kazanilan = 0; go(0); };
   }
 
-  go(0);
+  /* Dünyanın kapısı: kapak görseli, adı ve Başla. Oyun turlarında (bitis tanımlı) yoktur. */
+  function kapi() {
+    dots.innerHTML = world.screens.map(() => '<span class="dot"></span>').join("");
+    sc.innerHTML = STAR + `<span>${kazanilan}</span>`;
+    const bitti = store.worldDone(world.id);
+    const kapak = gorselEtiketi("dunya-" + world.no, "kapi-kapak").replace('loading="lazy"', 'loading="eager"');
+    card.innerHTML = "";
+    const k = el("div", "kapi");
+    k.innerHTML = `${kapak || bitSvg("mutlu", "bit bit-xl")}
+      <p class="kapi-no">Dünya ${world.no}</p>
+      <h2>${world.title}</h2>`;
+    const b = el("button", "btn kapi-basla", bitti ? "Tekrar oyna ➜" : "Başla ➜");
+    b.onclick = () => { sfx.tik(2); go(0); };
+    const a = el("div", "actions center"); a.append(b);
+    card.append(say(bitti ? `Bu dünyayı <b>bitirdin</b>. İstersen tekrar oyna!` : `<b>${world.screens.length} kısa adım</b> var. Haydi başlayalım!`, "mutlu"), k, a);
+    b.focus({ preventScroll: true });
+  }
+
+  if (world.bitis) go(0); else kapi();
   return { go };
 }

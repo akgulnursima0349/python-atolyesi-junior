@@ -360,7 +360,7 @@ async function hesapliMod(b, ad, vp) {
   ok(!(await tasma(p)), "hesaplı haritada yatay taşma yok"); await shot(p, "harita");
   await p.goto(URL + "#panel"); await p.waitForSelector(".node"); ok(true, "öğrenci paneli açamıyor");
   await p.click('.node[data-durak="on"]'); await p.click("text=Başla ➜"); await testCoz(p, ON_CEVAP);
-  await p.click("text=Haritaya dön"); await p.click('.node[data-no="1"]'); await p.waitForSelector(".card .say");
+  await p.click("text=Haritaya dön"); await p.click('.node[data-no="1"]'); await p.click(".kapi-basla"); await p.waitForSelector(".card .say");
   await oynaDil(p, () => {}); await p.click("text=Haritaya dön"); await p.waitForSelector('.node[data-no="1"].bitti');
   await p.waitForSelector('.hesap-durum[data-d="kaydedildi"]', { timeout: 8000 }); ok(true, "ilerleme buluta kaydedildi");
   const db = await p.evaluate(() => localStorage.getItem("junior-sahte-db"));
@@ -454,7 +454,10 @@ async function hesapliMod(b, ad, vp) {
 
     const oyunlar = [[1, oynaDil], [2, oynaIlk], [3, oynaKarar], [4, oynaDongu], [5, oynaListe], [6, oynaFonk], [7, oynaYz], [8, oynaRakam], [9, oynaPenguen], [10, (p, sh) => oynaRessam(p, sh, ad !== "masaustu")]];
     for (const [no, oyna] of oyunlar) {
-      await p.click(`.node[data-no="${no}"]`); await p.waitForSelector(".card .say");
+      await p.click(`.node[data-no="${no}"]`); await p.waitForSelector(".kapi");
+      ok(/Dünya \d/.test(await p.textContent(".kapi-no")) && await p.evaluate(() => { const i = document.querySelector(".kapi-kapak"); return !!i; }), `Dünya ${no} kapısında kapak görseli var`);
+      if (no === 4) await shot("kapi_dongu");
+      await p.click(".kapi-basla"); await p.waitForSelector(".card .say");
       ok(!(await tasma()), `Dünya ${no} ekranında yatay taşma yok`);
       await oyna(p, shot);
       ok(!(await tasma()), `Dünya ${no} sonunda yatay taşma yok`);
