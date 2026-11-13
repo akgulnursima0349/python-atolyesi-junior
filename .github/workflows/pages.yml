@@ -1,0 +1,36 @@
+# Junior'ı her main güncellemesinde derler, bütün kursu gerçek bir tarayıcıda oynatır, geçerse GitHub Pages'e yayınlar.
+# Adres: https://akgulnursima0349.github.io/python-atolyesi-junior/  (eski Python Atölyesi'nden ayrı)
+name: Junior'ı yayınla
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  yayinla:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npx vite build
+      - name: Kursu tarayıcıda baştan sona oyna (masaüstü + hesaplı mod)
+        run: |
+          npm i --no-save --prefix /tmp/pw playwright@1.49.1
+          npx --prefix /tmp/pw playwright install --with-deps chromium
+          mkdir -p /tmp/ekran
+          NODE_PATH=/tmp/pw/node_modules SADECE=masaustu EKRAN=/tmp/ekran node test/e2e.cjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: test-ekranlari, path: /tmp/ekran, if-no-files-found: ignore }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+      - id: deploy
+        uses: actions/deploy-pages@v4
