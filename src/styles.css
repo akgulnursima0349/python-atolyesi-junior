@@ -1006,3 +1006,10 @@ body { background: var(--bg) }
   .giris-kart small { font-size: 13px }
   .giris-kart .gk-ik { width: 36px; height: 36px }
 }
+
+/* dünya kapısı: kapak görseli ve Başla */
+.kapi { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px }
+.kapi-kapak { width: 100%; max-width: 640px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; background: #c4ecf0; margin-bottom: 8px; animation: pop .4s }
+.kapi-no { margin: 0; font-weight: 800; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent) }
+.kapi h2 { margin: 0; font-size: clamp(26px, 5vw, 38px); text-wrap: balance }
+.kapi-basla { font-size: 20px; padding: 14px 34px }
