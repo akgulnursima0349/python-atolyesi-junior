@@ -21,6 +21,6 @@ Junior'ı çocukların evden de açabileceği kalıcı bir adrese koymak; eski s
 - Test geçmeden yayınlamak.
 
 ## Bitti tanımı
-- [ ] Pages açık, iş akışı yeşil, adres açılıyor.
+- [x] Pages açık, iş akışı yeşil (ilk yayın 13 Kasım 2026, test dahil), adres yayında.
 - [ ] Yayındaki sitede giriş ekranı geliyor (hesaplı mod gerçek Supabase'e bağlı).
-- [ ] Eski site etkilenmedi.
+- [x] Eski site etkilenmedi (ayrı depo, ayrı adres; eski depoya dokunulmadı).
