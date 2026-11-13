@@ -184,19 +184,38 @@ async function dogruluk(ctx) {
   f.actions.prepend(opts);
 }
 
-/* 7 · Sırala: çizimden tahmine */
+/* 7 · Sırala: çizimden tahmine (her adımın gerçek görseli) */
+const RK_ADIM = ["Rakamı çiz", "8×8'e küçült", "64 sayıya çevir", "En yakın komşuları bul", "Oyları say"];
+const CIZIM7 = '<svg class="rk-ciz" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="10" fill="#000"/><path d="M26 24C40 22 60 22 74 24C64 42 54 60 46 80" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function sirala(ctx) {
   siralaEkrani(ctx, {
     soru: "Yapay zekâ bir rakamı nasıl okur? <b>Sırala!</b>",
     kartlar: ["✏️ Rakamı çiz", "🔲 8×8'e küçült", "🔢 64 sayıya çevir", "👥 En yakın komşuları bul", "🗳️ Oyları say"], karisik: [3, 1, 4, 0, 2],
-    sahne: (st) => { st.innerHTML = '<div class="col-center"><div class="big-count">✏️ → ❓</div></div>'; },
+    sahne: (st) => {
+      st.innerHTML = `<div class="rk-adimlar">${RK_ADIM.map((t, i) => `<div class="rk-adim"><div class="rk-g">${i === 0 ? CIZIM7 : '<div class="loading-dots"><i></i><i></i><i></i></div>'}</div><span>${i + 1}. ${t}</span></div>`).join("")}</div>`;
+      rakamlar().then((R) => {
+        if (!st.isConnected) return;
+        const ornek = R.tum.find((d) => d.y === 7) || R.tum[0];
+        const g = $$(".rk-g", st);
+        g[1].innerHTML = ""; g[1].append(rakamIzgara(ornek.x, { kucuk: true }));
+        const satir = []; for (let r = 0; r < 8; r++) satir.push(ornek.x.slice(r * 8, r * 8 + 8).map((v) => String(Math.round(v)).padStart(2)).join(" "));
+        g[2].innerHTML = `<pre class="rk-sayi">${satir.join("\n")}</pre>`;
+        const r = knn(R.egitim.filter((d) => d !== ornek), ornek.x, 4);
+        const kom = el("div", "rk-komsu"); r.komsular.forEach((n) => kom.append(rakamIzgara(R.egitim.filter((d) => d !== ornek)[n.i].x, { kucuk: true })));
+        g[3].innerHTML = ""; g[3].append(kom);
+        const say = {}; r.komsular.forEach((n) => (say[n.y] = (say[n.y] || 0) + 1));
+        g[4].innerHTML = `<div class="rk-oy">${Object.entries(say).sort((a, b) => b[1] - a[1]).map(([e, v]) => `<div><b>${e}</b><i style="--w:${v / 4}"></i></div>`).join("")}</div>`;
+      });
+    },
     calistir: async (sira, st) => {
-      const bc = $(".big-count", st);
+      const ad = $$(".rk-adim", st);
+      ad.forEach((x) => x.classList.remove("on", "bad"));
       for (let k = 0; k < sira.length; k++) {
-        bc.textContent = ["✏️", "🔲", "🔢", "👥", "🗳️"][sira[k]]; sfx.tik(k); await wait(380);
-        if (sira[k] !== k) { bc.textContent = "🤔"; ctx.say("Sıra karıştı! Önce <b>çizim</b>, en son <b>oylar</b>.", "uzgun"); return false; }
+        sfx.tik(k); await wait(380);
+        if (sira[k] !== k) { ad[k].classList.add("bad"); ctx.say("Sıra karıştı! Önce <b>çizim</b>, en son <b>oylar</b>.", "uzgun"); return false; }
+        ad[k].classList.add("on");
       }
-      bc.textContent = "✏️ → 7 ✅"; return true;
+      return true;
     },
     basari: "Çiz, küçült, sayıya çevir, komşulara sor: <b>işte YZ!</b>",
     rozet: "rakam okuyucu", yildiz: 2

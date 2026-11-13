@@ -1,11 +1,12 @@
 /* Dünya 1 · Bilgisayarın Dili */
-import { el, $, $$, wait, codePanel, hl, STAR } from "../core/ui.js";
+import { el, $, $$, wait, codePanel, STAR } from "../core/ui.js";
 import { bitSvg } from "../core/bit.js";
 import { sfx } from "../core/sound.js";
 import { tahminEkrani, siralaEkrani } from "../core/kaliplar.js";
+import { DIS, banyo } from "../core/cizim.js";
 
 /* 1 · Program = sıralı komutlar */
-const ADIMLAR = ["🪥 Fırçayı al", "🧴 Macunu sür", "😁 Dişlerini fırçala", "💧 Ağzını çalkala"];
+const ADIM = [["firca", "Fırçayı al"], ["macun", "Macunu sür"], ["fircala", "Dişlerini fırçala"], ["calkala", "Ağzını çalkala"]];
 const KOMIK = {
   1: "Macunu nereye süreyim? Elimde <b>fırça yok</b>!",
   2: "<b>Macunsuz</b> fırçaladım! Hiç köpürmedi.",
@@ -14,16 +15,33 @@ const KOMIK = {
 function tarif(ctx) {
   siralaEkrani(ctx, {
     soru: "Bit dişlerini fırçalayacak. Adımları <b>sırayla</b> seç!",
-    kartlar: ADIMLAR, karisik: [2, 0, 3, 1],
-    sahne: (st) => { st.innerHTML = `<div class="col-center">${bitSvg("mutlu", "bit bit-xl")}<div class="act-emoji" aria-live="polite"></div></div>`; },
+    kartlar: ADIM.map(([k, t]) => `<span class="k-ik">${DIS[k]()}</span>${t}`), karisik: [2, 0, 3, 1],
+    sahne: (st) => {
+      st.classList.add("dis-stage");
+      st.innerHTML = `<div class="dis-sahne">${banyo()}<div class="dis-bit">${bitSvg("mutlu", "bit")}</div>
+        <div class="dis-balon" aria-live="polite"><div class="dis-resim">${DIS.firca("dis-soluk")}</div><span class="dis-yazi">Hazırım!</span></div>
+        <ol class="dis-adimlar">${ADIM.map(() => "<li></li>").join("")}</ol></div>`;
+    },
     calistir: async (sira, st) => {
-      const em = $(".act-emoji", st);
+      const res = $(".dis-resim", st), yazi = $(".dis-yazi", st), noktalar = $$(".dis-adimlar li", st), balon = $(".dis-balon", st);
+      noktalar.forEach((n) => (n.className = ""));
+      balon.classList.remove("ok", "bad");
       for (let k = 0; k < sira.length; k++) {
-        em.textContent = ADIMLAR[sira[k]]; em.classList.remove("pop"); void em.offsetWidth; em.classList.add("pop"); sfx.tik(k);
-        await wait(650);
-        if (sira[k] !== k) { em.textContent = "🤪"; ctx.say(KOMIK[sira[k]] || "Sıra karıştı!", "uzgun"); return false; }
+        const [ad, t] = ADIM[sira[k]];
+        res.innerHTML = DIS[ad](); yazi.textContent = t;
+        balon.classList.remove("pop"); void balon.offsetWidth; balon.classList.add("pop"); sfx.tik(k);
+        await wait(700);
+        if (sira[k] !== k) {
+          res.innerHTML = DIS.karmasa(); yazi.textContent = "Olmadı!"; balon.classList.add("bad"); noktalar[k].className = "bad";
+          $(".dis-bit", st).innerHTML = bitSvg("uzgun", "bit");
+          ctx.say(KOMIK[sira[k]] || "Sıra karıştı!", "uzgun");
+          await wait(500); $(".dis-bit", st).innerHTML = bitSvg("mutlu", "bit");
+          return false;
+        }
+        noktalar[k].className = "ok";
       }
-      em.textContent = "✨😁✨";
+      res.innerHTML = DIS.parlak(); yazi.textContent = "Pırıl pırıl!"; balon.classList.add("ok");
+      $(".dis-bit", st).innerHTML = bitSvg("vay", "bit");
       return true;
     },
     basari: "Bilgisayar da böyle: komutları <b>sırayla</b> yapar.",
@@ -111,68 +129,110 @@ function lambaTahmin(ctx) {
   });
 }
 
-/* 5 · Diller merdiveni */
+/* 5 · Diller merdiveni: aynı program, her dilde gerçek hâli */
 const BASAMAK = [
-  { ad: "Python", kod: 'print("Merhaba")', soz: "<b>Python</b>: insanlar için kolay." },
-  { ad: "C", kod: 'printf("Merhaba");', soz: "<b>C</b>: biraz daha zor." },
-  { ad: "Assembly", kod: "mov rdi, mesaj\ncall puts", soz: "<b>Assembly</b>: makineye çok yakın." },
-  { ad: "Makine dili", kod: "01001101 01100101\n01110010 01101000", soz: "<b>Makine dili</b>: sadece 0 ve 1!" }
+  { ad: "Python", kod: ['print("Merhaba")'], not: ["Tek satır", "Noktalı virgül yok", "Süslü parantez yok"], soz: "<b>Python</b>: tek satır yeter. İnsanlar için kolay!" },
+  { ad: "C", kod: ["#include <stdio.h>", "", "int main() {", '    printf("Merhaba\\n");', "    return 0;", "}"], not: ["Önce kütüphane eklenir", "main olmadan çalışmaz", "Her komutun sonunda ;", "{ } ile bloklar"], soz: "<b>C</b>: aynı iş için <b>5 satır</b>! <code>main</code>, <code>;</code> ve <code>{ }</code> şart." },
+  { ad: "Assembly", kod: ["section .data", '  mesaj db "Merhaba", 0', "section .text", "  global main", "main:", "  mov rdi, mesaj", "  call puts", "  ret"], not: ["İşlemciye tek tek talimat", "Kutular (yazmaçlar) ile çalışır", "Okuması çok zor"], soz: "<b>Assembly</b>: işlemciye <b>tek tek</b> talimat. Makineye çok yakın." },
+  { ad: "Makine dili", kod: ["01001000 10001101 00111101 00001010", "00000000 00000000 00000000 11101000", "00000000 00000000 00000000 00000000", "11000011 01001101 01100101 01110010", "01101000 01100001 01100010 01100001", "00001010 00000000 01010101 01001000", "10001001 11100101 01001000 10000011", "11101100 00010000 10111111 00000001", "00000000 00000000 00000000 11000011", "01011101 11000011 00000000 00000000"], not: ["Sadece 0 ve 1", "En uzunu", "İnsan okuyamaz, işlemci anlar"], soz: "<b>Makine dili</b>: sadece 0 ve 1! İşlemci sonunda bunu okur." }
 ];
+const SATIR = BASAMAK.map((b) => b.kod.filter((t) => t.trim()).length);
+const escH = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 function merdiven(ctx) {
   const f = ctx.frame("Aynı <b>Merhaba</b> programı. Merdivenden in, dili değişsin!");
-  const cp = codePanel([BASAMAK[0].kod]);
+  const cp = codePanel([BASAMAK[0].kod[0]]);
   const st = el("div", "stage stairs-stage");
   st.innerHTML = `<div class="stairs">${BASAMAK.map((b, i) => `<div class="stair" style="--i:${i}"><span>${b.ad}</span></div>`).join("")}</div>
     <div class="stair-bit">${bitSvg("mutlu")}</div><div class="stair-labels"><span>İnsana yakın</span><span>Makineye yakın</span></div>`;
-  const etiket = el("div", "twin-h", BASAMAK[0].ad);
-  const sol = el("div", "twin"); sol.append(etiket, cp.node);
+  const etiket = el("div", "twin-h lang-h", "");
+  const notlar = el("ul", "lang-not");
+  const cmp = el("div", "lang-cmp", `<div class="twin-h">Kaç satır?</div>${BASAMAK.map((b, i) => `<div class="lc-row" data-i="${i}"><span>${b.ad}</span><i style="--w:${SATIR[i] / Math.max(...SATIR)}"></i><b>${SATIR[i]}</b></div>`).join("")}`);
+  const sol = el("div", "twin"); sol.append(etiket, cp.node, notlar, cmp);
   f.grid.append(sol, st);
   let i = 0;
+  const yaz = () => {
+    const b = BASAMAK[i];
+    etiket.innerHTML = `${b.ad} <span class="lang-say">${SATIR[i]} satır</span>`;
+    notlar.innerHTML = b.not.map((n) => `<li>${escH(n)}</li>`).join("");
+    $$(".lc-row", cmp).forEach((r, k) => { r.classList.toggle("on", k <= i); r.classList.toggle("cur", k === i); });
+  };
   const yerlestir = () => {
     $$(".stair", st).forEach((s, k) => s.classList.toggle("cur", k === i));
     const s = $$(".stair", st)[i], bit = $(".stair-bit", st), r = s.getBoundingClientRect(), sr = st.getBoundingClientRect();
     bit.style.left = r.left - sr.left + r.width / 2 - 26 + "px"; bit.style.top = r.top - sr.top - 50 + "px";
   };
+  yaz();
   requestAnimationFrame(yerlestir);
   const inB = el("button", "btn", "⬇ Bir basamak in");
   f.actions.prepend(inB);
   inB.onclick = () => {
     i++; sfx.tik(i);
-    etiket.textContent = BASAMAK[i].ad;
     cp.lines().forEach((l) => l.remove());
     const out = $(".out", cp.node);
-    BASAMAK[i].kod.split("\n").forEach((t) => out.before(el("div", "ln" + (i === 3 ? " bin" : ""), i < 2 ? hl(t) : t)));
-    yerlestir(); ctx.say(BASAMAK[i].soz, i === 3 ? "vay" : "mutlu");
-    if (i === 3) { inB.hidden = true; ctx.say("Bilgisayar sonunda hep <b>0 ve 1</b> okur!", "vay"); f.done(1, STAR + " en alta indin"); }
+    BASAMAK[i].kod.forEach((t) => out.before(el("div", "ln" + (i === 3 ? " bin" : ""), escH(t) || " ")));
+    yaz(); yerlestir(); ctx.say(BASAMAK[i].soz, i === 3 ? "vay" : "mutlu");
+    if (i === 3) { inB.hidden = true; ctx.say("Aşağı indikçe program <b>uzadı</b> ve okuması <b>zorlaştı</b>. Bilgisayar sonunda hep <b>0 ve 1</b> okur!", "vay"); f.done(1, STAR + " en alta indin"); }
   };
   const onResize = () => { if (st.isConnected) yerlestir(); else removeEventListener("resize", onResize); };
   addEventListener("resize", onResize);
 }
 
-/* 6 · İki çevirmen: yorumlayıcı ve derleyici */
+/* 6 · İki çevirmen: aynı programı (3. satırda hata) ikisi de çalıştırır, çocuk farkı görür */
+const PROG = ['print("Merhaba!")', 'print("Ben Bit.")', 'prnt("Nasılsın?")', 'print("Hoşça kal!")'];
+const CIKTI = ["Merhaba!", "Ben Bit."];
+const CEVIRMEN = [
+  { k: "satir", ad: "Satır satır çeviren", ne: "Bir satırı çevirir, <b>hemen</b> çalıştırır. Sonra sıradakine geçer.", ik: "🗣️" },
+  { k: "hepsi", ad: "Hepsini birden çeviren", ne: "Önce <b>bütün</b> programı okur. Hata yoksa çalıştırır.", ik: "📚" }
+];
 function cevirmen(ctx) {
-  const SAT = ["1. satır", "2. satır", "3. satır ❗", "4. satır"];
-  tahminEkrani(ctx, {
-    soru: "<b>3. satırda</b> hata var. Hangi çevirmen <b>hiç</b> çalıştırmaz?",
-    sahne: (st) => {
-      st.classList.add("lanes-stage");
-      st.innerHTML = ["satir", "hepsi"].map((k) => `<div class="lane" data-k="${k}"><div class="lane-h">${k === "satir" ? "🗣️ Satır satır çevirir" : "📚 Hepsini birden çevirir"}</div>
-        <div class="lane-rows">${SAT.map((s) => `<span class="lrow">${s}</span>`).join("")}</div><div class="lane-res"></div></div>`).join("");
-    },
-    secenekler: [
-      { t: "📚 Hepsini birden çeviren", dogru: true, genis: true },
-      { t: "🗣️ Satır satır çeviren", genis: true, ipucu: "O, hataya kadar olan satırları <b>çalıştırır</b>." }
-    ],
-    oynat: async (_, st) => {
-      const [a, b] = $$(".lane", st), ra = $$(".lrow", a), rb = $$(".lrow", b);
-      for (let k = 0; k < 3; k++) { ra[k].classList.add(k === 2 ? "bad" : "good"); sfx.tik(k); await wait(380); }
-      $(".lane-res", a).textContent = "2 satır çalıştı, sonra durdu";
-      for (let k = 0; k < 4; k++) { rb[k].classList.add(k === 2 ? "bad" : "scan"); await wait(220); }
-      $(".lane-res", b).textContent = "Hata bulundu: hiçbir satır çalışmadı";
-      sfx.yanlis(); await wait(400);
-    },
-    basari: "Python <b>satır satır</b> çevirir. Ona <b>yorumlayıcı</b> denir.",
-    rozet: "çevirmenleri tanıdın"
+  const f = ctx.frame("İki çevirmen aynı programı çalıştıracak. <b>3. satırda</b> yazım hatası var! İkisini de çalıştır.");
+  f.grid.classList.add("one");
+  const st = el("div", "stage cev-stage");
+  st.innerHTML = CEVIRMEN.map((c) => `<div class="cev" data-k="${c.k}">
+      <div class="cev-h"><span class="cev-ik">${c.ik}</span><div><b>${c.ad}</b><small>${c.ne}</small></div></div>
+      <ol class="cev-kod">${PROG.map((t, i) => `<li><span class="cev-no">${i + 1}</span><code>${escH(t)}</code></li>`).join("")}</ol>
+      <div class="cev-ekran" aria-live="polite"><span class="out-label">Ekran</span><div class="cev-out"></div></div>
+      <button class="btn cev-calis">▶ Çalıştır</button></div>`).join("");
+  f.grid.append(st);
+  const calisti = new Set();
+  const soruSor = () => {
+    ctx.say("İkisini de gördün! Peki <b>Python</b> hangisi gibi çalışır?");
+    const opts = el("div", "opts");
+    [["Satır satır çeviren", true], ["Hepsini birden çeviren", false]].forEach(([t, dogru]) => {
+      const b = el("button", "opt wide", t);
+      b.onclick = () => {
+        if (!dogru) { b.classList.add("no"); sfx.yanlis(); ctx.say("Python'da hatadan <b>önceki</b> satırlar ekrana yazar. Hangi çevirmende öyle oldu?", "uzgun"); return; }
+        b.classList.add("ok"); $$("button", opts).forEach((x) => (x.disabled = true));
+        ctx.say("Evet! Python <b>satır satır</b> çevirir: buna <b>yorumlayıcı</b> denir. C ise <b>hepsini birden</b> çevirir: buna <b>derleyici</b> denir.", "vay");
+        f.done(1, STAR + " çevirmenleri tanıdın");
+      };
+      opts.append(b);
+    });
+    f.actions.prepend(opts);
+  };
+  $$(".cev", st).forEach((kutu) => {
+    const btn = $(".cev-calis", kutu);
+    btn.onclick = async () => {
+      btn.disabled = true;
+      const sat = $$(".cev-kod li", kutu), out = $(".cev-out", kutu);
+      sat.forEach((s) => (s.className = "")); out.innerHTML = ""; kutu.classList.remove("hata");
+      if (kutu.dataset.k === "satir") {
+        for (let k = 0; k < 3; k++) {
+          sat[k].className = "now"; sfx.tik(k); await wait(450);
+          if (k === 2) { sat[k].className = "bad"; out.insertAdjacentHTML("beforeend", '<div class="cev-err">❌ 3. satırda hata: <code>prnt</code> diye bir komut yok</div>'); break; }
+          sat[k].className = "good"; out.insertAdjacentHTML("beforeend", `<div>${CIKTI[k]}</div>`); await wait(150);
+        }
+      } else {
+        for (let k = 0; k < 4; k++) { sat[k].className = k === 2 ? "bad" : "scan"; sfx.tik(k); await wait(260); }
+        await wait(250);
+        out.innerHTML = '<div class="cev-err">❌ 3. satırda hata. <b>Hiçbir satır</b> çalışmadı.</div>';
+      }
+      kutu.classList.add("hata"); sfx.yanlis(); await wait(300);
+      btn.disabled = false; btn.textContent = "↺ Tekrar çalıştır";
+      calisti.add(kutu.dataset.k);
+      if (calisti.size === 1) ctx.say(kutu.dataset.k === "satir" ? "Hatadan önce <b>2 satır</b> ekrana yazdı! Şimdi diğerini çalıştır." : "Ekran <b>bomboş</b>! Hiçbir satır çalışmadı. Şimdi diğerini çalıştır.");
+      else if (calisti.size === 2 && !$(".opts", f.actions)) soruSor();
+    };
   });
 }
 

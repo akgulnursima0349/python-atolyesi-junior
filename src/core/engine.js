@@ -10,6 +10,10 @@ import { gorselEtiketi } from "./gorseller.js";
 
 export function playWorld(world, root, opts = {}) {
   let at = 0, kazanilan = 0;
+  /* her ekranın yıldızı bir kez tutulur: geri dönüp tekrar bitirmek yıldızı artırmaz */
+  /* anahtar: "ekran:çerçeve" (bir ekran birkaç tur çerçeve açabilir, her turun yıldızı ayrı) */
+  let puan = {}, cerceve = 0;
+  const topla = () => { kazanilan = Object.values(puan).reduce((t, n) => t + n, 0); };
   root.innerHTML = "";
   const top = el("header", "w-top");
   const geri = world.geri || { href: "#harita", ad: "Harita", aria: "Haritaya dön" };
@@ -29,6 +33,7 @@ export function playWorld(world, root, opts = {}) {
     card,
     get stars() { return kazanilan; },
     frame(text, mood) {
+      const anahtar = at + ":" + cerceve++;
       card.innerHTML = "";
       card.append(say(text, mood));
       const grid = el("div", "grid"), actions = el("div", "actions");
@@ -37,10 +42,17 @@ export function playWorld(world, root, opts = {}) {
       next.onclick = () => go(at + 1);
       card.append(grid, actions);
       actions.append(next);
+      if (at > 0 && !world.bitis) {
+        const geriB = el("button", "btn sec geri-btn", "← Geri");
+        geriB.setAttribute("aria-label", "Önceki ekrana dön");
+        geriB.onclick = () => go(at - 1);
+        actions.append(geriB);
+      }
+      if (puan[anahtar] !== undefined) next.hidden = false; // daha önce bitirilmiş ekran
       let bitti = false;
       const done = (n = 1, rozet) => {
         if (!bitti) {
-          bitti = true; kazanilan += n; drawTop(); sfx.dogru();
+          bitti = true; puan[anahtar] = Math.max(puan[anahtar] || 0, n); topla(); drawTop(); sfx.dogru();
           if (rozet) actions.insertBefore(el("span", "badge", rozet), next);
         }
         next.hidden = false;
@@ -55,7 +67,7 @@ export function playWorld(world, root, opts = {}) {
   };
 
   function go(i) {
-    at = i;
+    at = i; cerceve = 0;
     if (at >= world.screens.length) return finish();
     drawTop();
     world.screens[at](ctx);
@@ -65,7 +77,7 @@ export function playWorld(world, root, opts = {}) {
   function finish() {
     if (world.bitis) {
       dots.innerHTML = world.screens.map(() => '<span class="dot on"></span>').join("");
-      return world.bitis(card, kazanilan, () => { kazanilan = 0; go(0); });
+      return world.bitis(card, kazanilan, () => { puan = {}; topla(); go(0); });
     }
     store.completeWorld(world.id, kazanilan);
     dots.innerHTML = world.screens.map(() => '<span class="dot on"></span>').join("");
@@ -77,7 +89,7 @@ export function playWorld(world, root, opts = {}) {
       ${opts.sonEk ? opts.sonEk(world) : ""}
       <div class="actions center"><a class="btn" href="#harita">Haritaya dön ➜</a><button class="btn sec" id="again">↺ Baştan oyna</button></div></div>`;
     confetti(); sfx.dogru();
-    $("#again", card).onclick = () => { kazanilan = 0; go(0); };
+    $("#again", card).onclick = () => { puan = {}; topla(); go(0); };
   }
 
   /* Dünyanın kapısı: kapak görseli, adı ve Başla. Oyun turlarında (bitis tanımlı) yoktur. */

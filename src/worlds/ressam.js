@@ -4,6 +4,7 @@ import { sfx } from "../core/sound.js";
 import { tahminEkrani, siralaEkrani } from "../core/kaliplar.js";
 import { uzaklik, enYakinMerkez, merkezleriTasi, kmeans } from "../ml/modeller.js";
 import { grafik, svgEl } from "../ml/grafik.js";
+import { yildizYolu, kmeansMini } from "../core/cizim.js";
 
 const RENK = ["#ff6b3d", "#22a6a0", "#a477ff", "#ffb800", "#4d9bff"];
 const virgul = (n) => n.toFixed(1).replace(".", ",");
@@ -15,15 +16,20 @@ function bulut() {
   return P;
 }
 const alan = () => grafik({ xmin: 0, xmax: 10, ymin: 0, ymax: 10, eksen: false, W: 320, H: 280 });
-function boya(g, P, atama, merkezler) {
+function boya(g, P, atama, merkezler, izler) {
   g.katman.cizgi.innerHTML = ""; g.katman.nokta.innerHTML = ""; g.katman.ust.innerHTML = "";
+  /* yıldızların geçmiş yerleri: kesik çizgili iz ve soluk yıldız */
+  (izler || []).forEach((iz, i) => {
+    if (iz.length < 2) return;
+    g.katman.ust.append(svgEl("polyline", { points: iz.map(([x, y]) => `${g.X(x)},${g.Y(y)}`).join(" "), class: "km-iz", stroke: RENK[i] }));
+    iz.slice(0, -1).forEach(([x, y]) => g.katman.ust.append(svgEl("polygon", { points: yildizYolu(g.X(x), g.Y(y), 7), fill: "none", stroke: RENK[i], "stroke-width": 1.5, opacity: 0.45 })));
+  });
   P.forEach((p, i) => {
     if (atama && merkezler) g.cizgi(p[0], p[1], merkezler[atama[i]][0], merkezler[atama[i]][1], "kln").style.stroke = RENK[atama[i]];
     const c = g.nokta(p[0], p[1], { r: 6, cls: "kpt" }); if (atama) c.style.fill = RENK[atama[i]];
   });
   (merkezler || []).forEach((m, i) => {
-    const t = svgEl("text", { x: g.X(m[0]), y: g.Y(m[1]) + 9, class: "kstar", "text-anchor": "middle", fill: RENK[i] });
-    t.textContent = "★"; g.katman.ust.append(t);
+    g.katman.ust.append(svgEl("polygon", { points: yildizYolu(g.X(m[0]), g.Y(m[1]), 13), fill: RENK[i], stroke: "#fff", "stroke-width": 2.5, "stroke-linejoin": "round", class: "kstar" }));
   });
 }
 
@@ -51,9 +57,12 @@ function adimAdim(ctx) {
   const f = ctx.frame("Yıldızlar kötü yerde. <b>Adım adım</b> düzelsinler!");
   const cp = codePanel(["for tur in range(10):", "    noktalari_boya()", "    yildizlari_tasi()"]);
   const P = bulut(), g = alan(), st = el("div", "stage col");
-  st.append(g.svg); st.append(el("div", "dg-note", "Tur: 0"));
+  const faz = el("div", "km-faz", '<span class="on">1 · Boya</span><span>2 · Taşı</span>');
+  st.append(faz, g.svg, el("div", "dg-note", "Tur: 0"));
   f.grid.append(cp.node, st);
   let M = [[1, 1], [5, 9], [9, 3]], atama = null, tur = 0, boyaSirasi = true;
+  const izler = M.map((m) => [m]);
+  const fazGoster = () => $$("span", faz).forEach((x, k) => x.classList.toggle("on", k === (boyaSirasi ? 0 : 1)));
   boya(g, P, null, M);
   const b = el("button", "btn", "👣 Bir adım"); f.actions.prepend(b);
   b.onclick = async () => {
@@ -61,17 +70,17 @@ function adimAdim(ctx) {
     if (boyaSirasi) {
       cp.line(1); const yeni = P.map((p) => enYakinMerkez(p, M));
       const degisti = !atama || yeni.some((v, i) => v !== atama[i]);
-      atama = yeni; boya(g, P, atama, M); sfx.tik(2);
+      atama = yeni; boya(g, P, atama, M, izler); sfx.tik(2);
       if (!degisti) { cp.line(-1); ctx.say("Hiçbir nokta renk değiştirmedi: K-Means <b>bitti</b>!", "vay"); f.done(1, STAR + " K-Means ustası"); b.hidden = true; return; }
       ctx.say("Noktalar en yakın yıldıza <b>boyandı</b>. Şimdi yıldızlar taşınsın!");
     } else {
       cp.line(2); tur++; const yeni = merkezleriTasi(P, atama, M);
       const adimSay = 8;
-      for (let s = 1; s <= adimSay; s++) { const ara = M.map((m, i) => [m[0] + ((yeni[i][0] - m[0]) * s) / adimSay, m[1] + ((yeni[i][1] - m[1]) * s) / adimSay]); boya(g, P, atama, ara); await wait(40); }
-      M = yeni; sfx.tik(5); $(".dg-note", st).textContent = "Tur: " + tur;
+      for (let s = 1; s <= adimSay; s++) { const ara = M.map((m, i) => [m[0] + ((yeni[i][0] - m[0]) * s) / adimSay, m[1] + ((yeni[i][1] - m[1]) * s) / adimSay]); boya(g, P, atama, ara, izler.map((iz, i) => [...iz, ara[i]])); await wait(40); }
+      M = yeni; yeni.forEach((m, i) => izler[i].push(m)); sfx.tik(5); $(".dg-note", st).textContent = "Tur: " + tur;
       ctx.say("Yıldızlar kendi grubunun <b>ortasına</b> kaydı. Tekrar boya!");
     }
-    boyaSirasi = !boyaSirasi; b.disabled = false;
+    boyaSirasi = !boyaSirasi; fazGoster(); b.disabled = false;
   };
 }
 
@@ -220,19 +229,22 @@ function popart(ctx) {
   };
 }
 
-/* 7 · Sırala: K-Means adımları */
+/* 7 · Sırala: K-Means adımları (her adımın küçük resmi) */
+const KM_ADIM = ["k tane yıldız koy", "Noktaları en yakın yıldıza boya", "Yıldızı grubun ortasına taşı", "Değişmeyene kadar tekrarla"];
 function sirala(ctx) {
   siralaEkrani(ctx, {
     soru: "K-Means nasıl çalışır? Adımları <b>sırala</b>!",
-    kartlar: ["🎯 k tane yıldız koy", "🎨 Noktaları en yakın yıldıza boya", "🚚 Yıldızı grubun ortasına taşı", "🔁 Değişmeyene kadar tekrarla"], karisik: [2, 0, 3, 1],
-    sahne: (st) => { st.innerHTML = '<div class="col-center"><div class="big-count">★ ★ ★</div></div>'; },
+    kartlar: KM_ADIM.map((t, i) => `<span class="km-kart">${kmeansMini(i, "")}</span>${t}`), karisik: [2, 0, 3, 1],
+    sahne: (st) => { st.innerHTML = `<div class="km-sahne">${KM_ADIM.map((t, i) => `<figure>${kmeansMini(i)}<figcaption>${i + 1}. adım</figcaption></figure>`).join("")}</div>`; },
     calistir: async (sira, st) => {
-      const bc = $(".big-count", st);
+      const fig = $$(".km-sahne figure", st);
+      fig.forEach((x) => (x.className = ""));
       for (let k = 0; k < sira.length; k++) {
-        bc.textContent = ["🎯", "🎨", "🚚", "🔁"][sira[k]]; sfx.tik(k); await wait(420);
-        if (sira[k] !== k) { bc.textContent = "🤔"; ctx.say("Sıra karıştı! Önce <b>yıldızlar</b>, en son <b>tekrar</b>.", "uzgun"); return false; }
+        sfx.tik(k); await wait(420);
+        if (sira[k] !== k) { fig[k].className = "bad"; ctx.say("Sıra karıştı! Önce <b>yıldızlar</b>, en son <b>tekrar</b>.", "uzgun"); return false; }
+        fig[k].className = "on";
       }
-      bc.textContent = "🎉"; return true;
+      return true;
     },
     basari: "Kursu bitirdin! Artık bir <b>yapay zekâ kaşifisin</b>!",
     rozet: "K-Means adımları", yildiz: 2

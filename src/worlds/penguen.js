@@ -3,6 +3,7 @@ import { el, $, $$, wait, codePanel, STAR } from "../core/ui.js";
 import { sfx } from "../core/sound.js";
 import { tahminEkrani, yazEkrani } from "../core/kaliplar.js";
 import { PENGUEN } from "../ml/penguen-veri.js";
+import { penguenCiz } from "../core/cizim.js";
 
 const TUR = {
   Adelie: { renk: "#ff8a5c", ad: "Adelie", not: "küçük gagalı, kısa yüzgeçli" },
@@ -12,9 +13,7 @@ const TUR = {
 const TURLER = Object.keys(TUR);
 const virgul = (n, d = 1) => n.toFixed(d).replace(".", ",");
 const ortalama = (t, i) => { const g = PENGUEN.filter((p) => p[0] === t); return g.reduce((s, p) => s + p[i], 0) / g.length; };
-const penguenSvg = (renk, cls = "") => `<svg class="peng ${cls}" viewBox="0 0 60 70" aria-hidden="true"><ellipse cx="30" cy="40" rx="22" ry="28" fill="#1b2440"/><ellipse cx="30" cy="45" rx="14" ry="20" fill="#fff"/>
-  <circle cx="23" cy="24" r="3.5" fill="#fff"/><circle cx="37" cy="24" r="3.5" fill="#fff"/><circle cx="23.5" cy="24.5" r="1.8" fill="#1b2440"/><circle cx="36.5" cy="24.5" r="1.8" fill="#1b2440"/>
-  <path d="M26 30 L34 30 L30 36 Z" fill="${renk}"/><ellipse cx="22" cy="67" rx="7" ry="3" fill="${renk}"/><ellipse cx="38" cy="67" rx="7" ry="3" fill="${renk}"/><rect x="18" y="8" width="24" height="6" rx="3" fill="${renk}"/></svg>`;
+const penguenSvg = (tur, cls = "") => penguenCiz(tur, cls + (tur === "Gentoo" ? " Gentoo-b" : ""));
 
 /* Bir grubu türlere göre sayan yığılmış çubuk */
 function cubuk(grup, etiket) {
@@ -32,12 +31,13 @@ function turler(ctx) {
   const kartlar = el("div", "peng-cards");
   const gorulen = new Set();
   TURLER.forEach((t) => {
-    const b = el("button", "peng-card", `${penguenSvg(TUR[t].renk)}<b>${t}</b><span class="peng-info">${TUR[t].not}<br>gaga ≈ ${virgul(ortalama(t, 1), 0)} mm · yüzgeç ≈ ${virgul(ortalama(t, 2), 0)} mm</span>`);
+    const b = el("button", "peng-card", `${penguenSvg(t)}<b>${t}</b><span class="peng-info">${TUR[t].not}<br>gaga ≈ ${virgul(ortalama(t, 1), 0)} mm · yüzgeç ≈ ${virgul(ortalama(t, 2), 0)} mm</span>`);
     b.onclick = () => {
       b.classList.add("open"); sfx.tik(gorulen.size + 1); gorulen.add(t);
       if (gorulen.size === 3) { ctx.say("Gaga ve yüzgeç <b>uzunluğu</b> türleri ayırmaya yarar!", "vay"); f.done(1, STAR + " penguen uzmanı"); }
       else ctx.say(`<b>${t}</b>: ${TUR[t].not}. Diğerlerine de dokun!`);
     };
+    b.style.setProperty("--c", TUR[t].renk);
     kartlar.append(b);
   });
   st.append(kartlar); f.grid.append(st);
@@ -113,7 +113,7 @@ function sor(ctx) {
   let pi = 0, adim = 0;
   const ciz = () => {
     const P = GIZEMLI[pi];
-    st.innerHTML = `<div class="myst">${penguenSvg("#9aa6b8", "myst-p")}<div class="myst-data"><b>Penguen ${pi + 1}</b><span>gaga: <b>${P.gaga} mm</b></span><span>yüzgeç: <b>${P.yuzgec} mm</b></span></div></div>
+    st.innerHTML = `<div class="myst">${penguenSvg(null, "myst-p")}<div class="myst-data"><b>Penguen ${pi + 1}</b><span>gaga: <b>${P.gaga} mm</b></span><span>yüzgeç: <b>${P.yuzgec} mm</b></span></div></div>
       <div class="ask-q">${adim === 0 ? `Yüzgeç <b>${P.yuzgec}</b> &gt; 206 mı?` : `Gaga <b>${P.gaga}</b> &gt; 43 mü?`}</div>`;
     evet.disabled = hayir.disabled = false;
   };
@@ -124,7 +124,7 @@ function sor(ctx) {
     const yaprak = adim === 0 ? (e ? "Gentoo" : null) : e ? "Chinstrap" : "Adelie";
     if (!yaprak) { adim = 1; ciz(); ctx.say("Doğru! Şimdi <b>gaga</b> sorusu."); return; }
     evet.disabled = hayir.disabled = true;
-    $(".myst-p", st).outerHTML = penguenSvg(TUR[yaprak].renk, "myst-p reveal");
+    $(".myst-p", st).outerHTML = penguenSvg(yaprak, "myst-p reveal");
     $(".ask-q", st).innerHTML = `Bu bir <b style="color:${TUR[yaprak].renk}">${yaprak}</b>!`;
     await wait(1000); pi++; adim = 0;
     if (pi < GIZEMLI.length) { ciz(); ctx.say("Bir gizemli penguen daha geldi!"); }
@@ -164,7 +164,7 @@ function orman(ctx) {
   f.grid.classList.add("one");
   const x = [45.5, 200];
   const st = el("div", "stage col");
-  st.innerHTML = `<div class="myst">${penguenSvg("#9aa6b8")}<div class="myst-data"><b>Zor penguen</b><span>gaga: <b>45,5 mm</b></span><span>yüzgeç: <b>200 mm</b></span></div></div>
+  st.innerHTML = `<div class="myst">${penguenSvg(null)}<div class="myst-data"><b>Zor penguen</b><span>gaga: <b>45,5 mm</b></span><span>yüzgeç: <b>200 mm</b></span></div></div>
     <div class="forest">${ORMAN.map((_, i) => `<div class="ftree"><span class="ft-ico">🌳</span><b class="ft-vote">?</b><small>ağaç ${i + 1}</small></div>`).join("")}</div><div class="nb-votes"></div>`;
   f.grid.append(st);
   const b = el("button", "btn", "🗳️ Oylat");
