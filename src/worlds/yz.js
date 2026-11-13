@@ -11,6 +11,31 @@ const EMO = { elma: "🍎", portakal: "🍊" };
 const satirYaz = (cp, i, s) => { cp.lines()[i].innerHTML = hl(s); };
 const meyveGrafik = () => grafik({ xmin: 115, xmax: 210, ymin: 0, ymax: 11, xetiket: "ağırlık (gram)", yetiket: "kabuk pürüzü" });
 
+/* 0 · Çantada ne var? Üç alet (kütüphane) */
+const ALETLER = [
+  { ad: "Pandas", ik: "📋", c: "#4d9bff", kod: "import pandas as pd", is: "Tabloları okur", detay: "Bir defter gibi: satırlar ve sütunlar. Meyvelerin <em>ağırlığını</em> ve <em>pürüzünü</em> tabloda tutar, ortalamasını tek satırda bulur." },
+  { ad: "Matplotlib", ik: "📈", c: "#ff8a5c", kod: "import matplotlib.pyplot as plt", is: "Grafik çizer", detay: "Kalem ve cetvel gibi: sayıları <em>noktalara</em> çevirir. Elmalarla portakalların ayrı durduğunu gözünle görürsün." },
+  { ad: "scikit-learn", ik: "🤖", c: "#22a6a0", kod: "from sklearn.neighbors import ...", is: "Model kurar ve eğitir", detay: "Hazır yapay zekâ kutuları: <em>örnekleri</em> verirsin (fit), model öğrenir. Sonra <em>yeni</em> bir şey sorarsın (predict)." }
+];
+const aletEtiketi = (ad, is) => el("div", "alet-etiket", `🧰 Alet: <b>${ad}</b> · ${is}`);
+function canta(ctx) {
+  const f = ctx.frame("Yapay zekâ yaparken çantadan <b>3 alet</b> çıkaracağız. Her alete <b>dokun</b>, ne işe yaradığını gör!");
+  f.grid.classList.add("one");
+  const st = el("div", "stage col");
+  st.innerHTML = `<div class="alet-cards">${ALETLER.map((a, i) => `<button class="alet" data-i="${i}" style="--c:${a.c}"><span class="alet-ik">${a.ik}</span><b>${a.ad}</b><span class="alet-is">${a.is}</span><code>${a.kod}</code><span class="alet-detay">${a.detay}</span></button>`).join("")}</div>
+    <p class="ozellik-not">Alet = başkalarının yazdığı <b>hazır kod</b> (kütüphane). <code>import</code> ile çantadan çıkarırız; her şeyi sıfırdan yazmayız.</p>`;
+  f.grid.append(st);
+  const acik = new Set();
+  $$(".alet", st).forEach((b) => {
+    b.onclick = () => {
+      const a = ALETLER[+b.dataset.i];
+      b.classList.add("open"); sfx.tik(acik.size + 1); acik.add(a.ad);
+      if (acik.size === 3) { ctx.say("Çanta hazır: <b>tablo</b>, <b>grafik</b> ve <b>model</b>. Hepsini birazdan kullanacağız!", "vay"); f.done(1, STAR + " alet çantası"); }
+      else ctx.say(`<b>${a.ad}</b>: ${a.is.toLocaleLowerCase("tr")}. Diğer aletlere de dokun!`);
+    };
+  });
+}
+
 /* 1 · Kural yazmayız, örnek gösteririz */
 function ornek(ctx) {
   const f = ctx.frame("Yapay zekâya kural yazmayız, <b>örnek</b> gösteririz!");
@@ -18,6 +43,7 @@ function ornek(ctx) {
   const ORN = [[140, 2, "elma"], [175, 8, "portakal"], [130, 1, "elma"], [185, 10, "portakal"]];
   const st = el("div", "stage col");
   st.innerHTML = `<div class="ex-cards">${ORN.map(([a, p, t], i) => `<button class="ex-card" data-i="${i}"><span class="ex-e">${EMO[t]}</span><span>${a} g</span><span>pürüz ${p}</span></button>`).join("")}</div>
+    <p class="ozellik-not">Her meyveyi iki <b>özellik</b> anlatır: <b>ağırlık</b> (gram) ve <b>pürüz</b> (kabuğu ne kadar pütürlü, 1–10). Örnekleri modele ver!</p>
     <div class="brain"><span class="brain-ico">🧠</span><span class="brain-n">0 örnek</span></div><div class="ask" hidden></div>`;
   f.grid.append(st);
   let n = 0;
@@ -51,6 +77,7 @@ function tablo(ctx) {
   const SUT = [["agirlik", "ağırlık"], ["puruz", "pürüz"], ["tur", "tür"]];
   st.innerHTML = `<table class="df"><thead><tr><th></th>${SUT.map(([k, t]) => `<th><button data-k="${k}">${t}</button></th>`).join("")}</tr></thead>
     <tbody>${TABLO.map(([a, p, t], i) => `<tr><td class="idx">${i}</td><td data-k="agirlik">${a}</td><td data-k="puruz">${p}</td><td data-k="tur">${EMO[t]} ${t}</td></tr>`).join("")}</tbody></table>`;
+  st.prepend(aletEtiketi("Pandas", "tablo okur"));
   f.grid.append(cp.node, st);
   const ort = el("button", "btn sec", "📊 Ortalama ağırlık");
   f.actions.prepend(ort);
@@ -77,9 +104,9 @@ function tablo(ctx) {
 function cizim(ctx) {
   const f = ctx.frame("Tabloyu <b>grafiğe</b> çevirelim. Her meyve bir nokta!");
   const cp = codePanel(["import matplotlib.pyplot as plt", 'plt.scatter(df["agirlik"], df["puruz"])', "plt.show()"]);
-  const st = el("div", "stage");
+  const st = el("div", "stage col");
   const g = meyveGrafik();
-  st.append(g.svg);
+  st.append(aletEtiketi("Matplotlib", "grafik çizer"), g.svg);
   f.grid.append(cp.node, st);
   const b = el("button", "btn", "📈 Çiz");
   f.actions.prepend(b);
@@ -124,7 +151,7 @@ function model(ctx) {
   const g = meyveGrafik();
   MEYVE.forEach(([a, p, t]) => g.nokta(a, p, { cls: t }));
   const yeni = g.nokta(150, 3, { r: 9, cls: "yeni" });
-  st.append(g.svg);
+  st.append(aletEtiketi("scikit-learn", "model kurar ve eğitir"), g.svg);
   st.insertAdjacentHTML("beforeend", `<div class="sliders"><label>⚖️ <input type="range" id="w" min="120" max="205" value="150" aria-label="ağırlık"><b class="sv">150 g</b></label>
     <label>🪨 <input type="range" id="p" min="1" max="10" value="3" aria-label="pürüz"><b class="sv">3</b></label></div><div class="verdict" aria-live="polite"></div>`);
   f.grid.append(cp.node, st);
@@ -152,7 +179,7 @@ function sirala(ctx) {
     soru: "Modelle çalışmanın <b>3 adımı</b> var. Sırala!",
     kod: true,
     kartlar: ["model = KNeighborsClassifier()", "model.fit(X, y)", "model.predict([[170, 8]])"], karisik: [2, 0, 1],
-    sahne: (st) => { st.innerHTML = `<div class="pipeline">${[["🏗️", "kur"], ["📚", "eğit"], ["❓", "sor"]].map(([e, t]) => `<div class="pipe-step"><span>${e}</span><b>${t}</b></div>`).join('<span class="pipe-ar">→</span>')}</div>`; },
+    sahne: (st) => { st.classList.add("col"); st.innerHTML = `<div class="alet-etiket">🧰 Alet: <b>scikit-learn</b> · kur, eğit, sor</div><div class="pipeline">${[["🏗️", "kur"], ["📚", "eğit"], ["❓", "sor"]].map(([e, t]) => `<div class="pipe-step"><span>${e}</span><b>${t}</b></div>`).join('<span class="pipe-ar">→</span>')}</div>`; },
     calistir: async (sira, st) => {
       const s = $$(".pipe-step", st);
       s.forEach((x) => x.classList.remove("on", "bad"));
@@ -213,6 +240,6 @@ function yaz(ctx) {
 
 export const yz = {
   id: "yz", no: 7, title: "Yapay Zekânın Alet Çantası", icon: "beyin", color: "#ffd84d",
-  screens: [ornek, tablo, cizim, yeniMeyve, model, sirala, yaz],
-  ozet: ["Yapay zekâ örneklerden öğrenir", 'df["agirlik"] → tablodan sütun (Pandas)', "plt.scatter → nokta grafiği (Matplotlib)", "model.fit → eğit, model.predict → sor"]
+  screens: [canta, ornek, tablo, cizim, yeniMeyve, model, sirala, yaz],
+  ozet: ["Alet çantası: Pandas (tablo), Matplotlib (grafik), scikit-learn (model)", "Yapay zekâ örneklerden öğrenir", 'df["agirlik"] → tablodan sütun (Pandas)', "plt.scatter → nokta grafiği (Matplotlib)", "model.fit → eğit, model.predict → sor"]
 };
