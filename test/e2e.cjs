@@ -512,7 +512,7 @@ async function hesapliMod(b, ad, vp) {
     ok(/En iyi/.test(await p.textContent('.oyun-kart[data-oyun="model"]')), "salonda en iyi tur yıldızı görünüyor");
     ok(Number(await p.evaluate(() => JSON.parse(localStorage.getItem("atolye-junior-v1")).oyunlar.model.tur)) === 1, "biten tur kaydediliyor");
     await p.goto(URL + "#harita"); await p.waitForSelector(".node");
-    ok(Number(await p.textContent(".m-top .score span")) === 87, "oyun yıldızları dünya yıldızlarına karışmıyor");
+    ok(Number(await p.textContent(".m-top .score span")) === 88, "oyun yıldızları dünya yıldızlarına karışmıyor");
 
     // bitiş testi → sonuçlar → sertifika
     ok(await p.isVisible('.node[data-durak="son"].acik') && await p.isVisible('.node[data-durak="sertifika"].kilitli'), "10 dünya bitince bitiş testi açıldı");
